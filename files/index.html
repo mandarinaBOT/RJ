@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彩虹餐盤 · 均衡飲食小幫手</title>
+<style>
+  :root{
+    --bg:#F7F8F2;
+    --paper:#FFFFFF;
+    --ink:#22312A;
+    --muted:#6E7D72;
+    --line:#E4E8DD;
+    --brand:#355E3B;
+    --brand-soft:#E7EEE4;
+    --r-red:#E2574C;
+    --r-orange:#E89B3B;
+    --r-yellow:#F0C238;
+    --r-green:#5BA053;
+    --r-purple:#8E6FB0;
+    --r-white:#C7B79A;
+    --shadow:0 1px 2px rgba(34,49,42,.06),0 8px 24px rgba(34,49,42,.06);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 18px 120px}
+
+  /* ---------- header / hero ---------- */
+  header{padding:34px 0 22px;text-align:center}
+  .eyebrow{
+    font-size:12px;letter-spacing:.28em;color:var(--brand);
+    font-weight:700;text-transform:uppercase;margin-bottom:14px;
+  }
+  .plate{width:148px;height:148px;display:block;margin:0 auto 18px;filter:drop-shadow(0 10px 22px rgba(34,49,42,.12))}
+  h1{font-size:30px;margin:0 0 8px;font-weight:800;letter-spacing:.02em}
+  .lede{color:var(--muted);font-size:15px;max-width:440px;margin:0 auto}
+
+  /* ---------- tabs ---------- */
+  nav.tabs{
+    position:sticky;top:0;z-index:20;
+    display:flex;gap:4px;padding:10px 0 12px;margin-bottom:8px;
+    background:linear-gradient(var(--bg) 78%,rgba(247,248,242,0));
+  }
+  nav.tabs button{
+    flex:1;border:0;cursor:pointer;font-family:inherit;
+    padding:10px 3px;border-radius:12px;font-size:12px;font-weight:700;
+    color:var(--muted);background:transparent;transition:.18s;
+  }
+  nav.tabs button .ico{display:block;font-size:17px;margin-bottom:2px}
+  nav.tabs button[aria-selected="true"]{background:var(--brand);color:#fff;box-shadow:var(--shadow)}
+  nav.tabs button:focus-visible{outline:2.5px solid var(--brand);outline-offset:2px}
+
+  section[role="tabpanel"]{animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;margin-bottom:16px;box-shadow:var(--shadow);
+  }
+  .card h2{font-size:19px;margin:0 0 4px;font-weight:800}
+  .card .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+
+  /* ---------- 六大類 ---------- */
+  .groups{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .g{display:flex;gap:11px;align-items:flex-start;padding:12px;border-radius:14px;background:var(--brand-soft)}
+  .g .dot{width:34px;height:34px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;font-size:18px;color:#fff}
+  .g b{display:block;font-size:14.5px}
+  .g span{font-size:12px;color:var(--muted);line-height:1.45}
+
+  /* ---------- 彩虹 ---------- */
+  .rainbow{display:flex;flex-direction:column;gap:9px}
+  .ray{display:flex;align-items:center;gap:12px}
+  .ray .swatch{width:46px;height:30px;border-radius:9px;flex:0 0 auto}
+  .ray b{font-size:14px;min-width:34px}
+  .ray span{font-size:12.5px;color:var(--muted)}
+
+  /* ---------- 地中海金字塔 ---------- */
+  .pyr{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+  .lvl{margin:0 auto;padding:9px 12px;border-radius:10px;text-align:center;color:#fff;font-size:13px;font-weight:600}
+  .lvl small{display:block;font-weight:400;font-size:11px;opacity:.92}
+
+  /* ---------- 食材發想 ---------- */
+  .ingredients{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px}
+  .ing{border:1px solid var(--line);background:#fff;border-radius:13px;padding:11px 4px;cursor:pointer;font-family:inherit;text-align:center;transition:.15s}
+  .ing:hover{border-color:var(--brand);background:var(--brand-soft)}
+  .ing .ie{font-size:23px;display:block;margin-bottom:2px;line-height:1}
+  .ing b{font-size:12.5px;font-weight:700;color:var(--ink)}
+  .ing[aria-pressed="true"]{background:var(--brand);border-color:var(--brand)}
+  .ing[aria-pressed="true"] b{color:#fff}
+  .ing:focus-visible{outline:2.5px solid var(--brand);outline-offset:2px}
+  .searchrow{display:flex;gap:8px}
+  .searchrow input{flex:1}
+  .searchrow .btn{width:auto;margin-top:0;padding:0 20px;white-space:nowrap;flex:0 0 auto}
+
+  /* ---------- 餐盤分享 ---------- */
+  .banner{background:#FBEEDD;border:1px solid #F0D9B8;color:#92662A;border-radius:12px;padding:10px 13px;font-size:12.5px;margin-bottom:14px;line-height:1.55}
+  .composer{display:flex;flex-direction:column;gap:10px}
+  .namerow{display:flex;gap:10px;align-items:center}
+  .namerow label{font-size:13px;font-weight:700;white-space:nowrap}
+  .posts{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+  .post{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+  .post .phead{display:flex;align-items:center;gap:9px;padding:11px 14px}
+  .post .ava{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex:0 0 auto}
+  .post .pmeta b{font-size:14px;display:block;line-height:1.25}
+  .post .pmeta span{font-size:11px;color:var(--muted)}
+  .post img.pimg{width:100%;display:block;background:#f0f0ec}
+  .post .pcap{padding:11px 14px;font-size:14px;color:#2f3f35;line-height:1.55}
+  .post .pfoot{display:flex;align-items:center;gap:6px;padding:0 14px 12px}
+  .likebtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--muted);transition:.15s}
+  .likebtn:hover{border-color:var(--r-red);color:var(--r-red)}
+  .likebtn.on{background:#FBEDEB;border-color:var(--r-red);color:var(--r-red)}
+  .empty{text-align:center;color:var(--muted);padding:36px 10px;font-size:13.5px}
+
+  /* ---------- inputs ---------- */
+  label.fld{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
+  textarea,input[type=text]{
+    width:100%;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;
+    font-family:inherit;font-size:15px;color:var(--ink);background:#FCFDFB;resize:vertical;
+  }
+  textarea:focus,input:focus{outline:2.5px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:11px 0 4px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;color:var(--muted);font-family:inherit;transition:.15s}
+  .chip:hover{border-color:var(--brand);color:var(--brand)}
+  .btn{
+    width:100%;margin-top:14px;border:0;cursor:pointer;font-family:inherit;
+    background:var(--brand);color:#fff;font-weight:800;font-size:15px;
+    padding:14px;border-radius:14px;transition:.18s;box-shadow:var(--shadow);
+  }
+  .btn:hover{background:#2b4d31}
+  .btn:disabled{background:#9DB0A2;cursor:not-allowed;box-shadow:none}
+  .btn.ghost{background:#fff;color:var(--brand);border:1.5px solid var(--line);box-shadow:none}
+
+  /* ---------- meal results ---------- */
+  .meal{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:11px;background:#FCFDFB}
+  .meal .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .meal .mtype{font-size:12px;font-weight:800;letter-spacing:.05em;color:var(--brand)}
+  .meal .kcal{font-size:13px;font-weight:800;color:var(--ink)}
+  .meal .mname{font-size:16px;font-weight:700;margin:2px 0 6px}
+  .meal ul{margin:0 0 9px;padding-left:18px;font-size:13.5px;color:#3c4d43}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:11px;padding:3px 9px;border-radius:999px;font-weight:700;color:#fff}
+  .tag.grp{background:var(--brand);color:#fff}
+  .total{display:flex;justify-content:space-between;align-items:center;background:var(--brand-soft);border-radius:13px;padding:13px 16px;font-weight:800;margin:4px 0 12px}
+  .total .num{font-size:22px}
+  .tiplist{margin:8px 0 0;padding-left:18px;font-size:13.5px;color:#3c4d43}
+  .tiplist li{margin-bottom:4px}
+
+  /* ---------- photo ---------- */
+  .drop{border:2px dashed var(--line);border-radius:16px;padding:30px 16px;text-align:center;cursor:pointer;background:#FCFDFB;transition:.18s}
+  .drop:hover{border-color:var(--brand);background:var(--brand-soft)}
+  .drop .big{font-size:30px;margin-bottom:6px}
+  .drop p{margin:2px 0;color:var(--muted);font-size:13px}
+  .preview{max-width:100%;border-radius:14px;margin-top:4px;display:block}
+  .meter{display:flex;align-items:center;gap:10px;margin:7px 0}
+  .meter .ml{min-width:64px;font-size:13px;font-weight:700}
+  .meter .lvl-tag{font-size:11px;padding:2px 9px;border-radius:999px;font-weight:700}
+  .lv-ok{background:#E7EEE4;color:var(--brand)}
+  .lv-low{background:#FBEEDD;color:#B5762A}
+  .lv-high{background:#F7E0DD;color:#C0473C}
+
+  /* ---------- misc ---------- */
+  .spin{display:inline-block;width:17px;height:17px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px;margin-right:7px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .spin.brand{border-color:var(--brand-soft);border-top-color:var(--brand);vertical-align:-3px}
+  .err{background:#FBEDEB;border:1px solid #F1C9C3;color:#A83B2E;border-radius:12px;padding:12px 14px;font-size:13.5px;margin-top:12px}
+  .note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6}
+  @media (max-width:480px){
+    h1{font-size:25px}
+    .groups{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">每天吃滿一盤顏色</div>
+    <svg class="plate" viewBox="0 0 200 200" aria-label="彩虹餐盤" role="img">
+      <circle cx="100" cy="100" r="92" fill="#fff" stroke="#E4E8DD" stroke-width="3"/>
+      <path d="M100,100 L100,20 A80,80 0 0,1 169.28,60 Z" fill="#E2574C"/>
+      <path d="M100,100 L169.28,60 A80,80 0 0,1 169.28,140 Z" fill="#E89B3B"/>
+      <path d="M100,100 L169.28,140 A80,80 0 0,1 100,180 Z" fill="#F0C238"/>
+      <path d="M100,100 L100,180 A80,80 0 0,1 30.72,140 Z" fill="#5BA053"/>
+      <path d="M100,100 L30.72,140 A80,80 0 0,1 30.72,60 Z" fill="#8E6FB0"/>
+      <path d="M100,100 L30.72,60 A80,80 0 0,1 100,20 Z" fill="#C7B79A"/>
+      <circle cx="100" cy="100" r="30" fill="#fff"/>
+      <circle cx="100" cy="100" r="30" fill="none" stroke="#E4E8DD" stroke-width="2"/>
+    </svg>
+    <h1>彩虹餐盤</h1>
+    <p class="lede">認識均衡飲食的基礎，讓 AI 幫你規劃每日菜單、看照片估熱量。</p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="learn"><span class="ico">📖</span>飲食知識</button>
+    <button role="tab" aria-selected="false" data-tab="menu"><span class="ico">📝</span>菜單建議</button>
+    <button role="tab" aria-selected="false" data-tab="photo"><span class="ico">📷</span>拍照分析</button>
+    <button role="tab" aria-selected="false" data-tab="idea"><span class="ico">🍳</span>食材發想</button>
+    <button role="tab" aria-selected="false" data-tab="share"><span class="ico">🍽️</span>餐盤分享</button>
+  </nav>
+
+  <!-- ============ 飲食知識 ============ -->
+  <section role="tabpanel" id="learn">
+    <div class="card">
+      <h2>六大類食物</h2>
+      <p class="sub">每天從六大類各取所需，是均衡的起點。</p>
+      <div class="groups">
+        <div class="g"><div class="dot" style="background:#C79A3B">🍚</div><div><b>全榖雜糧</b><span>飯、麵、地瓜、燕麥，主要的能量來源。</span></div></div>
+        <div class="g"><div class="dot" style="background:#E2574C">🍗</div><div><b>豆魚蛋肉</b><span>蛋白質來源，順序由植物性往動物性。</span></div></div>
+        <div class="g"><div class="dot" style="background:#4F94C4">🥛</div><div><b>乳品類</b><span>牛奶、優格、起司，補鈣好幫手。</span></div></div>
+        <div class="g"><div class="dot" style="background:#5BA053">🥬</div><div><b>蔬菜類</b><span>膳食纖維、維生素，餐餐都要有。</span></div></div>
+        <div class="g"><div class="dot" style="background:#E89B3B">🍎</div><div><b>水果類</b><span>每天兩份，原型水果優於果汁。</span></div></div>
+        <div class="g"><div class="dot" style="background:#8E6FB0">🥜</div><div><b>油脂與堅果</b><span>適量好油與堅果，幫助吸收營養。</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>彩虹飲食</h2>
+      <p class="sub">不同顏色的蔬果，提供不同的植化素。一天吃越多顏色越好。</p>
+      <div class="rainbow">
+        <div class="ray"><div class="swatch" style="background:var(--r-red)"></div><b>紅</b><span>番茄、紅椒、草莓 — 茄紅素、護心。</span></div>
+        <div class="ray"><div class="swatch" style="background:var(--r-orange)"></div><b>橙黃</b><span>胡蘿蔔、南瓜、玉米 — β-胡蘿蔔素、顧眼睛。</span></div>
+        <div class="ray"><div class="swatch" style="background:var(--r-green)"></div><b>綠</b><span>青花菜、菠菜、芭樂 — 葉酸、葉黃素。</span></div>
+        <div class="ray"><div class="swatch" style="background:var(--r-purple)"></div><b>藍紫</b><span>茄子、藍莓、紫高麗 — 花青素、抗氧化。</span></div>
+        <div class="ray"><div class="swatch" style="background:var(--r-white)"></div><b>白</b><span>白蘿蔔、洋蔥、菇類 — 硫化物、提升防護力。</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>地中海飲食</h2>
+      <p class="sub">被視為最均衡的飲食型態之一，由下往上、由多到少。</p>
+      <div class="pyr">
+        <div class="lvl" style="background:#5BA053;width:96%">蔬果、全榖、豆類、堅果<small>每餐的主體，搭配橄欖油</small></div>
+        <div class="lvl" style="background:#4F94C4;width:74%">魚類與海鮮<small>每週至少兩次</small></div>
+        <div class="lvl" style="background:#C79A3B;width:54%">家禽、蛋、乳製品<small>適量</small></div>
+        <div class="lvl" style="background:#E2574C;width:34%">紅肉與甜點<small>少量、偶爾</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 菜單建議 ============ -->
+  <section role="tabpanel" id="menu" hidden>
+    <div class="card">
+      <h2>每日菜單建議</h2>
+      <p class="sub">說說你的需求，AI 依均衡原則排一天的菜單。</p>
+      <label class="fld" for="needs">你的需求</label>
+      <textarea id="needs" rows="3" placeholder="例如：想增肌、一天約 2000 大卡、不吃牛肉、午餐想帶便當…"></textarea>
+      <div class="chips" id="needChips">
+        <button class="chip">減脂 1500 大卡</button>
+        <button class="chip">增肌高蛋白</button>
+        <button class="chip">純素</button>
+        <button class="chip">少油少鹽</button>
+        <button class="chip">外食族</button>
+        <button class="chip">控制血糖</button>
+      </div>
+      <button class="btn" id="menuBtn">生成今日菜單</button>
+      <div id="menuOut"></div>
+    </div>
+  </section>
+
+  <!-- ============ 拍照分析 ============ -->
+  <section role="tabpanel" id="photo" hidden>
+    <div class="card">
+      <h2>拍照估熱量</h2>
+      <p class="sub">上傳一餐的照片，AI 估算熱量與營養均衡，給你調整建議。</p>
+      <div class="drop" id="drop">
+        <div class="big">📷</div>
+        <p><b>點此上傳餐點照片</b></p>
+        <p>JPG / PNG，看得清楚食物即可</p>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+      <div id="photoArea"></div>
+    </div>
+  </section>
+
+  <!-- ============ 食材發想 ============ -->
+  <section role="tabpanel" id="idea" hidden>
+    <div class="card">
+      <h2>食材發想</h2>
+      <p class="sub">手邊有什麼食材？選一個基本款，或自己輸入，AI 給你幾道輕料理。</p>
+      <label class="fld">食材基本盤</label>
+      <div class="ingredients" id="ingGrid">
+        <button class="ing" data-ing="雞肉"><span class="ie">🍗</span><b>雞肉</b></button>
+        <button class="ing" data-ing="牛肉"><span class="ie">🥩</span><b>牛肉</b></button>
+        <button class="ing" data-ing="豬肉"><span class="ie">🍖</span><b>豬肉</b></button>
+        <button class="ing" data-ing="番茄"><span class="ie">🍅</span><b>番茄</b></button>
+        <button class="ing" data-ing="馬鈴薯"><span class="ie">🥔</span><b>馬鈴薯</b></button>
+        <button class="ing" data-ing="蛋"><span class="ie">🥚</span><b>蛋</b></button>
+        <button class="ing" data-ing="南瓜"><span class="ie">🎃</span><b>南瓜</b></button>
+        <button class="ing" data-ing="蝦"><span class="ie">🦐</span><b>蝦</b></button>
+        <button class="ing" data-ing="魚類"><span class="ie">🐟</span><b>魚類</b></button>
+        <button class="ing" data-ing="豆腐"><span class="ie">🍥</span><b>豆腐</b></button>
+      </div>
+      <label class="fld" for="ingInput" style="margin-top:18px">搜尋其他食材</label>
+      <div class="searchrow">
+        <input type="text" id="ingInput" placeholder="例如：高麗菜、香菇、鮭魚…">
+        <button class="btn" id="ingBtn">發想</button>
+      </div>
+      <div id="ideaOut"></div>
+    </div>
+  </section>
+
+  <!-- ============ 餐盤分享 ============ -->
+  <section role="tabpanel" id="share" hidden>
+    <div class="card">
+      <h2>餐盤分享</h2>
+      <p class="sub">上傳今天的餐盤，跟線上的大家分享你的健康飲食。</p>
+      <div id="shareBanner"></div>
+      <div class="composer">
+        <div class="namerow">
+          <label for="userName">暱稱</label>
+          <input type="text" id="userName" maxlength="16" placeholder="你的暱稱">
+        </div>
+        <div class="drop" id="shareDrop">
+          <div class="big">🍱</div>
+          <p><b>點此選擇餐盤照片</b></p>
+          <p>會自動壓縮後再上傳</p>
+        </div>
+        <input type="file" id="shareFile" accept="image/*" hidden>
+        <img id="sharePreview" class="preview" style="display:none" alt="預覽">
+        <textarea id="shareCap" rows="2" placeholder="說點什麼…今天吃了什麼好料？"></textarea>
+        <button class="btn" id="postBtn" disabled>發布貼文</button>
+        <div id="shareErr"></div>
+      </div>
+      <div class="posts" id="feed"></div>
+    </div>
+  </section>
+
+  <p class="note">
+    熱量與營養為 AI 概估，僅供日常參考，非醫療或臨床建議。<br>
+    若有特殊疾病或飲食需求，請諮詢醫師或營養師。
+  </p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+/* ---------------- 分頁切換 ---------------- */
+const tabs = document.querySelectorAll('nav.tabs button');
+const panels = {learn:document.getElementById('learn'), menu:document.getElementById('menu'), photo:document.getElementById('photo'), idea:document.getElementById('idea'), share:document.getElementById('share')};
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.setAttribute('aria-selected', x===t?'true':'false'));
+  Object.entries(panels).forEach(([k,p])=>p.hidden = (k!==t.dataset.tab));
+  window.scrollTo({top:0,behavior:'smooth'});
+}));
+
+/* ---------------- 顏色對應 ---------------- */
+const COLOR = {'紅':'#E2574C','橙':'#E89B3B','橙黃':'#E89B3B','黃':'#F0C238','綠':'#5BA053','藍':'#8E6FB0','紫':'#8E6FB0','藍紫':'#8E6FB0','白':'#C7B79A'};
+const tagColor = c => COLOR[c] || '#6E7D72';
+
+/* ===================================================================
+   ★★★ 只要改這一行 ★★★
+   把引號中間換成你在 Google AI Studio 申請的免費金鑰
+   =================================================================== */
+const GEMINI_API_KEY = "在這裡貼上你的金鑰";
+
+/* 免費層可用的模型，會由上往下自動嘗試，找到能用的就記住 */
+const GEMINI_MODELS = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-flash-lite"];
+let workingModel = null;
+
+/* 把 Anthropic 格式的訊息轉成 Gemini 的 parts */
+function toGeminiParts(messages){
+  const parts = [];
+  (messages||[]).forEach(m=>{
+    if(typeof m.content === 'string'){ parts.push({text:m.content}); return; }
+    (m.content||[]).forEach(b=>{
+      if(b.type === 'text') parts.push({text:b.text});
+      else if(b.type === 'image' && b.source) parts.push({inline_data:{mime_type:b.source.media_type, data:b.source.data}});
+    });
+  });
+  return parts;
+}
+
+async function askAI(messages, maxTokens){
+  if(!GEMINI_API_KEY || GEMINI_API_KEY.indexOf("貼上") >= 0){
+    throw new Error("還沒填入金鑰。請打開網頁原始碼，把 GEMINI_API_KEY 換成你在 Google AI Studio 申請的金鑰。");
+  }
+  const body = {
+    contents:[{parts: toGeminiParts(messages)}],
+    generationConfig:{ maxOutputTokens: maxTokens||2048, temperature:0.9, responseMimeType:"application/json" }
+  };
+  const tryList = workingModel ? [workingModel] : GEMINI_MODELS;
+  let lastErr = null;
+
+  for(let i=0;i<tryList.length;i++){
+    const model = tryList[i];
+    try{
+      const res = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+encodeURIComponent(GEMINI_API_KEY),
+        { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) }
+      );
+      const data = await res.json().catch(()=>null);
+      if(!res.ok){
+        const msg = (data && data.error && data.error.message) || ("回應代碼 "+res.status);
+        lastErr = new Error(msg);
+        if(res.status === 404 || /not found|not supported/i.test(msg)) continue;  // 換下一個模型
+        if(res.status === 400 && /API key/i.test(msg)) throw new Error("金鑰無效，請確認有完整複製、且沒有多餘空格。");
+        if(res.status === 429) throw new Error("今天的免費額度用完了，等一段時間再試。");
+        throw lastErr;
+      }
+      const cand = data && data.candidates && data.candidates[0];
+      const text = cand && cand.content && cand.content.parts
+        ? cand.content.parts.map(p=>p.text||"").join("").trim() : "";
+      if(!text) throw new Error("AI 沒有回覆內容，請再試一次。");
+      workingModel = model;
+      return text;
+    }catch(e){
+      lastErr = e;
+      if(!/not found|not supported|回應代碼 404/i.test(e.message||"")) throw e;
+    }
+  }
+  throw lastErr || new Error("呼叫失敗，請稍後再試。");
+}
+function parseJSON(txt){
+  const clean = txt.replace(/```json/gi,"").replace(/```/g,"").trim();
+  const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+  return JSON.parse(s>=0 ? clean.slice(s,e+1) : clean);
+}
+
+/* ---------------- 菜單建議 ---------------- */
+document.querySelectorAll('#needChips .chip').forEach(c=>c.addEventListener('click',()=>{
+  const ta=document.getElementById('needs');
+  ta.value = (ta.value.trim()? ta.value.trim()+'、':'') + c.textContent;
+  ta.focus();
+}));
+
+const menuBtn = document.getElementById('menuBtn');
+menuBtn.addEventListener('click', async ()=>{
+  const needs = document.getElementById('needs').value.trim();
+  const out = document.getElementById('menuOut');
+  if(!needs){ out.innerHTML = '<div class="err">先說說你的需求，例如熱量、飲食偏好或目標。</div>'; return; }
+  menuBtn.disabled = true;
+  menuBtn.innerHTML = '<span class="spin"></span>規劃中…';
+  out.innerHTML = '';
+  const prompt = `你是均衡飲食的營養顧問。依使用者需求，設計「一天」的飲食菜單，強調六大類均衡與彩虹蔬果多樣性，避免極端節食。`+
+    `使用者需求：「${needs}」。\n`+
+    `只回傳 JSON，不要任何說明文字或 markdown。格式：\n`+
+    `{"summary":"一句話特色","totalCalories":整數,"meals":[{"type":"早餐","name":"餐點名","items":["品項1","品項2"],"calories":整數,"colors":["紅","綠"],"groups":["蔬菜","全榖雜糧"]}],"tips":["建議1","建議2"]}\n`+
+    `meals 請含早餐、午餐、晚餐，可加一個點心。colors 用顏色字（紅/橙/黃/綠/藍紫/白）。groups 用六大類名稱。全部用繁體中文。`;
+  try{
+    const data = parseJSON(await askAI([{role:"user",content:prompt}], 2000));
+    renderMenu(data, out);
+  }catch(e){
+    out.innerHTML = '<div class="err">產生菜單時出了點問題，請再試一次。<br><small>'+(e.message||e)+'</small></div>';
+  }finally{
+    menuBtn.disabled = false; menuBtn.textContent = '重新生成菜單';
+  }
+});
+
+function renderMenu(d, out){
+  let h = '';
+  if(d.summary) h += '<p class="sub" style="margin:14px 0 12px">💡 '+esc(d.summary)+'</p>';
+  if(d.totalCalories) h += '<div class="total"><span>全日約</span><span class="num">'+d.totalCalories+' <span style="font-size:13px">大卡</span></span></div>';
+  (d.meals||[]).forEach(m=>{
+    h += '<div class="meal"><div class="top"><span class="mtype">'+esc(m.type||'')+'</span>'+
+         (m.calories?'<span class="kcal">'+m.calories+' 大卡</span>':'')+'</div>'+
+         '<div class="mname">'+esc(m.name||'')+'</div>';
+    if(m.items&&m.items.length){ h+='<ul>'+m.items.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul>'; }
+    h += '<div class="tags">';
+    (m.groups||[]).forEach(g=> h+='<span class="tag grp">'+esc(g)+'</span>');
+    (m.colors||[]).forEach(c=> h+='<span class="tag" style="background:'+tagColor(c)+'">'+esc(c)+'</span>');
+    h += '</div></div>';
+  });
+  if(d.tips&&d.tips.length){
+    h += '<div style="margin-top:14px"><b style="font-size:14px">小提醒</b><ul class="tiplist">'+
+         d.tips.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul></div>';
+  }
+  out.innerHTML = h;
+}
+
+/* ---------------- 拍照分析 ---------------- */
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+const photoArea = document.getElementById('photoArea');
+let imgB64 = null, imgType = 'image/jpeg';
+
+drop.addEventListener('click', ()=>fileInput.click());
+fileInput.addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  imgType = f.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    imgB64 = reader.result.split(',')[1];
+    photoArea.innerHTML =
+      '<img class="preview" src="'+reader.result+'" alt="餐點預覽">'+
+      '<button class="btn" id="anaBtn" style="margin-top:12px">分析這一餐</button>'+
+      '<button class="btn ghost" id="reBtn">換一張</button>';
+    document.getElementById('anaBtn').addEventListener('click', analyze);
+    document.getElementById('reBtn').addEventListener('click', ()=>{ fileInput.value=''; fileInput.click(); });
+  };
+  reader.readAsDataURL(f);
+});
+
+async function analyze(){
+  const btn = document.getElementById('anaBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>分析中…';
+  const old = photoArea.querySelector('#result'); if(old) old.remove();
+  const prompt = `你是均衡飲食顧問。看這張餐點照片，估算熱量與營養均衡，給實用且正向的調整建議，強調均衡與多樣，不鼓勵極端節食。`+
+    `只回傳 JSON，不要任何說明或 markdown。格式：\n`+
+    `{"dishName":"推測餐點","foods":["食物1","食物2"],"totalCalories":整數,"range":"500-650","groups":[{"name":"蔬菜","level":"足夠"}],"rainbow":["紅","綠"],"balance":"整體均衡一句話","suggestions":["建議1","建議2"]}\n`+
+    `level 只能是「足夠」「偏少」或「偏多」。rainbow 用顏色字。全部繁體中文。`;
+  try{
+    const txt = await askAI([{role:"user",content:[
+      {type:"image",source:{type:"base64",media_type:imgType,data:imgB64}},
+      {type:"text",text:prompt}
+    ]}], 1500);
+    renderPhoto(parseJSON(txt));
+  }catch(e){
+    const div=document.createElement('div'); div.id='result';
+    div.innerHTML = '<div class="err">分析失敗，換張清楚一點的照片再試。<br><small>'+(e.message||e)+'</small></div>';
+    photoArea.appendChild(div);
+  }finally{
+    btn.disabled = false; btn.textContent = '重新分析';
+  }
+}
+
+function levelClass(l){ return l==='偏少'?'lv-low':(l==='偏多'?'lv-high':'lv-ok'); }
+function renderPhoto(d){
+  let h = '<div class="card" style="margin:14px 0 0;box-shadow:none;border-color:var(--brand-soft)">';
+  if(d.dishName) h += '<h2 style="font-size:17px">'+esc(d.dishName)+'</h2>';
+  if(d.foods&&d.foods.length) h += '<p class="sub">辨識到：'+d.foods.map(esc).join('、')+'</p>';
+  if(d.totalCalories) h += '<div class="total"><span>這一餐約</span><span class="num">'+d.totalCalories+
+       ' <span style="font-size:13px">大卡</span></span></div>';
+  if(d.range) h += '<p class="sub" style="margin-top:-6px">估計區間 '+esc(d.range)+' 大卡</p>';
+  if(d.groups&&d.groups.length){
+    h += '<b style="font-size:14px">營養均衡</b>';
+    d.groups.forEach(g=>{ h += '<div class="meter"><span class="ml">'+esc(g.name)+
+      '</span><span class="lvl-tag '+levelClass(g.level)+'">'+esc(g.level)+'</span></div>'; });
+  }
+  if(d.rainbow&&d.rainbow.length){
+    h += '<div class="tags" style="margin:8px 0">';
+    d.rainbow.forEach(c=> h+='<span class="tag" style="background:'+tagColor(c)+'">'+esc(c)+'</span>');
+    h += '</div>';
+  }
+  if(d.balance) h += '<p style="font-size:13.5px;color:#3c4d43;margin:8px 0 0">⚖️ '+esc(d.balance)+'</p>';
+  if(d.suggestions&&d.suggestions.length){
+    h += '<b style="font-size:14px;display:block;margin-top:10px">建議</b><ul class="tiplist">'+
+         d.suggestions.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';
+  }
+  h += '</div>';
+  const div=document.createElement('div'); div.id='result'; div.innerHTML=h;
+  photoArea.appendChild(div);
+}
+
+/* ---------------- 食材發想 ---------------- */
+document.querySelectorAll('#ingGrid .ing').forEach(b=>b.addEventListener('click',()=>{
+  document.getElementById('ingInput').value='';
+  suggestIdea(b.dataset.ing);
+}));
+document.getElementById('ingBtn').addEventListener('click',()=>{
+  suggestIdea(document.getElementById('ingInput').value.trim());
+});
+document.getElementById('ingInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter') suggestIdea(e.target.value.trim());
+});
+
+let ideaBusy=false;
+async function suggestIdea(ing){
+  const out=document.getElementById('ideaOut');
+  if(!ing){ out.innerHTML='<div class="err">先選一個食材，或輸入你想用的食材。</div>'; return; }
+  if(ideaBusy) return;
+  ideaBusy=true;
+  document.querySelectorAll('#ingGrid .ing').forEach(b=>b.setAttribute('aria-pressed', b.dataset.ing===ing?'true':'false'));
+  out.innerHTML='<p class="sub" style="margin:16px 0"><span class="spin brand"></span> 正在發想「'+esc(ing)+'」的料理…</p>';
+  const prompt='你是輕飲食料理顧問。使用者手邊有「'+ing+'」這個食材，請推薦 4 道以它為主、做法清爽健康（少油少加工，多用蒸、煮、烤、涼拌）的家常料理。'+
+    '只回傳 JSON，不要任何說明或 markdown。格式：\n'+
+    '{"ingredient":"'+ing+'","intro":"一句話","dishes":[{"name":"菜名","desc":"一句話做法重點","calories":整數,"time":"約15分鐘","tags":["低油","快速"]}]}\n'+
+    'calories 是單人份概估熱量。全部用繁體中文。';
+  try{
+    const data=parseJSON(await askAI([{role:"user",content:prompt}],1800));
+    renderIdea(data,out);
+  }catch(e){
+    out.innerHTML='<div class="err">發想時出了點問題，請再試一次。<br><small>'+(e.message||e)+'</small></div>';
+  }finally{ ideaBusy=false; }
+}
+
+function renderIdea(d,out){
+  let h='';
+  if(d.intro) h+='<p class="sub" style="margin:14px 0 12px">💡 '+esc(d.intro)+'</p>';
+  (d.dishes||[]).forEach(dish=>{
+    h+='<div class="meal"><div class="top"><span class="mname" style="margin:0">'+esc(dish.name||'')+'</span>'+
+       (dish.calories?'<span class="kcal">'+dish.calories+' 大卡</span>':'')+'</div>';
+    if(dish.desc) h+='<p style="font-size:13.5px;color:#3c4d43;margin:6px 0 9px">'+esc(dish.desc)+'</p>';
+    h+='<div class="tags">';
+    if(dish.time) h+='<span class="tag" style="background:#6E7D72">⏱ '+esc(dish.time)+'</span>';
+    (dish.tags||[]).forEach(t=>h+='<span class="tag grp">'+esc(t)+'</span>');
+    h+='</div></div>';
+  });
+  out.innerHTML=h || '<div class="err">這個食材暫時想不到，換個說法再試試。</div>';
+}
+
+/* ---------------- 餐盤分享 ---------------- */
+/* 填入你的 Firebase 專案設定（Firebase 控制台 → 專案設定 → 你的應用程式） */
+const FIREBASE_CONFIG = {
+  apiKey: "你的_API_KEY",
+  authDomain: "你的專案.firebaseapp.com",
+  projectId: "你的專案ID",
+  storageBucket: "你的專案.appspot.com",
+  messagingSenderId: "你的_SENDER_ID",
+  appId: "你的_APP_ID"
+};
+
+let db=null, shareMode='demo', demoPosts=[], shareImg=null;
+const myLikes=new Set();
+let userName='訪客_'+Math.floor(1000+Math.random()*9000);
+
+(function initShare(){
+  const configured = FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.includes('你的');
+  document.getElementById('userName').value=userName;
+  if(typeof firebase!=='undefined' && configured){
+    try{
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db=firebase.firestore();
+      shareMode='live';
+      db.collection('posts').orderBy('ts','desc').limit(50).onSnapshot(
+        snap=>{ const arr=[]; snap.forEach(d=>arr.push(Object.assign({id:d.id},d.data()))); renderFeed(arr); },
+        err=>{ document.getElementById('feed').innerHTML='<div class="err">讀取貼文失敗：'+esc(err.message)+'</div>'; }
+      );
+    }catch(e){ shareMode='demo'; }
+  }
+  if(shareMode==='demo'){
+    document.getElementById('shareBanner').innerHTML='<div class="banner">📡 <b>示範模式</b>：尚未連接 Firebase，貼文只暫存在這個瀏覽器分頁、重整就消失，也不會跟別人共享。填好上方 FIREBASE_CONFIG 並部署後，即為真正的線上分享。</div>';
+    renderFeed(demoPosts);
+  }
+})();
+
+document.getElementById('userName').addEventListener('input',e=>{ userName=e.target.value.trim()||userName; });
+
+const shareDrop=document.getElementById('shareDrop');
+const shareFile=document.getElementById('shareFile');
+shareDrop.addEventListener('click',()=>shareFile.click());
+shareFile.addEventListener('change',async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  shareDrop.querySelector('p b').textContent='壓縮中…';
+  try{
+    shareImg=await compressImage(f);
+    const pv=document.getElementById('sharePreview');
+    pv.src=shareImg; pv.style.display='block';
+    document.getElementById('postBtn').disabled=false;
+    shareDrop.querySelector('p b').textContent='已選好，可換一張';
+  }catch(err){ shareDrop.querySelector('p b').textContent='讀取失敗，再試一次'; }
+});
+
+const postBtn=document.getElementById('postBtn');
+postBtn.addEventListener('click',async ()=>{
+  if(!shareImg) return;
+  const errBox=document.getElementById('shareErr'); errBox.innerHTML='';
+  const caption=document.getElementById('shareCap').value.trim();
+  const name=(document.getElementById('userName').value.trim()||userName).slice(0,16);
+  postBtn.disabled=true; postBtn.innerHTML='<span class="spin"></span>發布中…';
+  try{
+    if(shareMode==='live'){
+      await db.collection('posts').add({ name:name, caption:caption, image:shareImg, likes:0, ts:firebase.firestore.FieldValue.serverTimestamp() });
+    }else{
+      demoPosts.unshift({ id:'d'+Date.now(), name:name, caption:caption, image:shareImg, likes:0, ts:new Date() });
+      renderFeed(demoPosts);
+    }
+    shareImg=null;
+    document.getElementById('sharePreview').style.display='none';
+    document.getElementById('shareCap').value='';
+    shareDrop.querySelector('p b').textContent='點此選擇餐盤照片';
+  }catch(e){
+    errBox.innerHTML='<div class="err">發布失敗：'+esc(e.message||String(e))+'</div>';
+  }finally{
+    postBtn.disabled=false; postBtn.textContent='發布貼文';
+  }
+});
+
+function timeAgo(ts){
+  let d;
+  try{ d = ts&&ts.toDate ? ts.toDate() : new Date(ts); }catch(_){ d=null; }
+  if(!d || isNaN(d.getTime())) return '剛剛';
+  const s=Math.floor((Date.now()-d.getTime())/1000);
+  if(s<60) return '剛剛';
+  if(s<3600) return Math.floor(s/60)+' 分鐘前';
+  if(s<86400) return Math.floor(s/3600)+' 小時前';
+  return Math.floor(s/86400)+' 天前';
+}
+
+function renderFeed(posts){
+  const feed=document.getElementById('feed');
+  if(!posts || !posts.length){ feed.innerHTML='<div class="empty">還沒有人分享餐盤，當第一個吧！🍽️</div>'; return; }
+  feed.innerHTML=posts.map(p=>{
+    const initial=esc(String(p.name||'訪').charAt(0));
+    const liked=myLikes.has(p.id);
+    return '<div class="post">'+
+      '<div class="phead"><div class="ava">'+initial+'</div>'+
+        '<div class="pmeta"><b>'+esc(p.name||'匿名')+'</b><span>'+timeAgo(p.ts)+'</span></div></div>'+
+      '<img class="pimg" src="'+esc(p.image||'')+'" alt="餐盤照片">'+
+      (p.caption?'<div class="pcap">'+esc(p.caption)+'</div>':'')+
+      '<div class="pfoot"><button class="likebtn'+(liked?' on':'')+'" data-id="'+esc(p.id)+'">❤️ '+(p.likes||0)+'</button></div>'+
+    '</div>';
+  }).join('');
+  feed.querySelectorAll('.likebtn').forEach(b=>b.addEventListener('click',()=>likePost(b.dataset.id)));
+}
+
+async function likePost(id){
+  if(myLikes.has(id)) return;
+  myLikes.add(id);
+  if(shareMode==='live'){
+    try{ await db.collection('posts').doc(id).update({ likes:firebase.firestore.FieldValue.increment(1) }); }
+    catch(e){ myLikes.delete(id); }
+  }else{
+    const p=demoPosts.find(x=>x.id===id); if(p){ p.likes=(p.likes||0)+1; renderFeed(demoPosts); }
+  }
+}
+
+function compressImage(file, maxDim, quality){
+  maxDim=maxDim||720; quality=quality||0.72;
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width, h=img.height;
+      if(w>h && w>maxDim){ h=Math.round(h*maxDim/w); w=maxDim; }
+      else if(h>=w && h>maxDim){ w=Math.round(w*maxDim/h); h=maxDim; }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      let q=quality, url=c.toDataURL('image/jpeg',q);
+      while(url.length>900000 && q>0.4){ q-=0.1; url=c.toDataURL('image/jpeg',q); }
+      resolve(url);
+    };
+    img.onerror=()=>reject(new Error('圖片讀取失敗'));
+    const r=new FileReader();
+    r.onload=()=>{ img.src=r.result; };
+    r.onerror=()=>reject(new Error('檔案讀取失敗'));
+    r.readAsDataURL(file);
+  });
+}
+
+/* ---------------- 工具 ---------------- */
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+</script>
+</body>
+</html>
