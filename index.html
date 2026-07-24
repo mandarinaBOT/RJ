@@ -370,7 +370,7 @@ const tagColor = c => COLOR[c] || '#6E7D72';
    ★★★ 只要改這一行 ★★★
    把引號中間換成你在 Google AI Studio 申請的免費金鑰
    =================================================================== */
-const GEMINI_API_KEY = "AQ.Ab8RN6J_uGwjbEtYSUqpMZTthvV9skGxPV-E73WWUFS1LX0Zsg";
+const GEMINI_API_KEY = "在這裡貼上你的金鑰";
 
 /* 也可以直接在網頁上貼金鑰（只保留在這個分頁） */
 let runtimeKey = "";
@@ -394,32 +394,49 @@ function getKey(){
 })();
 
 /* 免費層可用的模型，會由上往下自動嘗試，找到能用的就記住 */
-const GEMINI_MODELS = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-flash-lite"];
+/* 免費層可用的模型，會由上往下自動嘗試，找到能用的就記住 */
+const GEMINI_MODELS = ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite"];
 let workingModel = null;
 
-/* 把 Anthropic 格式的訊息轉成 Gemini 的 parts */
-function toGeminiParts(messages){
-  const parts = [];
+/* 把 Anthropic 格式的訊息轉成 Interactions API 的 input 陣列。
+   官方建議文字放在圖片前面，所以這裡會自動排序。 */
+function toGeminiInput(messages){
+  const texts = [], images = [];
   (messages||[]).forEach(m=>{
-    if(typeof m.content === 'string'){ parts.push({text:m.content}); return; }
+    if(typeof m.content === 'string'){ texts.push({type:"text", text:m.content}); return; }
     (m.content||[]).forEach(b=>{
-      if(b.type === 'text') parts.push({text:b.text});
-      else if(b.type === 'image' && b.source) parts.push({inline_data:{mime_type:b.source.media_type, data:b.source.data}});
+      if(b.type === 'text') texts.push({type:"text", text:b.text});
+      else if(b.type === 'image' && b.source)
+        images.push({type:"image", data:b.source.data, mime_type:b.source.media_type});
     });
   });
-  return parts;
+  return texts.concat(images);
 }
 
-/* 新版金鑰（AQ. 開頭）用 x-goog-api-key 標頭送；
-   萬一被瀏覽器擋下，自動退回舊的 ?key= 網址寫法。 */
-let authMode = null;   // 'header' | 'query'
-
-function geminiFetch(model, body, key, mode){
-  let url = "https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent";
-  const headers = {"Content-Type":"application/json"};
-  if(mode === 'header') headers["x-goog-api-key"] = key;
-  else url += "?key=" + encodeURIComponent(key);
-  return fetch(url, {method:"POST", headers:headers, body:JSON.stringify(body)});
+/* 從回應中取出文字：優先抓 model_output，抓不到再整包掃一遍 */
+function pullText(node){
+  let out = "";
+  (function walk(n){
+    if(!n || typeof n !== 'object') return;
+    if(Array.isArray(n)){ n.forEach(walk); return; }
+    if(typeof n.text === 'string'){ out += n.text; return; }
+    for(const k in n) walk(n[k]);
+  })(node);
+  return out.trim();
+}
+function extractText(data){
+  if(!data) return "";
+  if(typeof data.output_text === 'string' && data.output_text.trim()) return data.output_text.trim();
+  const steps = data.steps || data.Steps;
+  if(Array.isArray(steps)){
+    let out = "";
+    steps.forEach(s=>{
+      const mo = s && (s.model_output || s.modelOutput);
+      if(mo) out += pullText(mo);
+    });
+    if(out.trim()) return out.trim();
+  }
+  return pullText(data);
 }
 
 async function askAI(messages, maxTokens){
@@ -427,45 +444,47 @@ async function askAI(messages, maxTokens){
   if(!key){
     throw new Error("還沒填入金鑰。請把頁面最上方那個橘色框裡的欄位填上你的 Google AI Studio 金鑰，按「啟用」即可。");
   }
-  const body = {
-    contents:[{parts: toGeminiParts(messages)}],
-    generationConfig:{ maxOutputTokens: maxTokens||2048, temperature:0.9, responseMimeType:"application/json" }
-  };
+  const input = toGeminiInput(messages);
   const tryList = workingModel ? [workingModel] : GEMINI_MODELS;
-  const modes = authMode ? [authMode] : ['header','query'];
   let lastErr = null;
 
-  for(let m=0;m<modes.length;m++){
-    const mode = modes[m];
-    for(let i=0;i<tryList.length;i++){
-      const model = tryList[i];
-      let res;
-      try{
-        res = await geminiFetch(model, body, key, mode);
-      }catch(netErr){
-        lastErr = new Error("連線失敗，請確認網路是否正常。");
-        break;   // 這個傳送方式被擋，換下一種
-      }
-      const data = await res.json().catch(()=>null);
-
-      if(res.ok){
-        const cand = data && data.candidates && data.candidates[0];
-        const text = cand && cand.content && cand.content.parts
-          ? cand.content.parts.map(p=>p.text||"").join("").trim() : "";
-        if(!text){ lastErr = new Error("AI 沒有回覆內容，請再試一次。"); continue; }
-        workingModel = model; authMode = mode;
-        return text;
-      }
-
-      const msg = (data && data.error && data.error.message) || ("回應代碼 "+res.status);
-      lastErr = new Error(msg);
-      if(res.status === 404 || /not found|not supported for/i.test(msg)) continue;          // 換模型
-      if(res.status === 401 || /ACCESS_TOKEN_TYPE_UNSUPPORTED/i.test(msg)) break;           // 換傳送方式
-      if(res.status === 403 || /API key not valid|invalid/i.test(msg))
-        throw new Error("金鑰無法使用。請到 aistudio.google.com 重新建立一把新金鑰，並確認完整複製、沒有多餘空格。");
-      if(res.status === 429) throw new Error("免費額度暫時用完了，等一段時間再試。");
-      break;
+  for(let i=0;i<tryList.length;i++){
+    const model = tryList[i];
+    let res;
+    try{
+      res = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json", "x-goog-api-key": key },
+        body:JSON.stringify({
+          model: model,
+          input: input,
+          store: false,
+          response_format:{ type:"text", mime_type:"application/json" },
+          generation_config:{ temperature:0.9, max_output_tokens: maxTokens||2048 }
+        })
+      });
+    }catch(netErr){
+      throw new Error("連線失敗，請確認網路是否正常。");
     }
+
+    const data = await res.json().catch(()=>null);
+
+    if(res.ok){
+      const text = extractText(data);
+      if(!text){ lastErr = new Error("AI 沒有回覆內容，請再試一次。"); continue; }
+      workingModel = model;
+      return text;
+    }
+
+    const msg = (data && data.error && data.error.message) || ("回應代碼 "+res.status);
+    lastErr = new Error(msg);
+    if(res.status === 404 || /not found|not supported|invalid model/i.test(msg)) continue;   // 換模型
+    if(res.status === 401 || /ACCESS_TOKEN_TYPE_UNSUPPORTED|invalid authentication/i.test(msg))
+      throw new Error("金鑰無法通過驗證。請到 aistudio.google.com 的 API Keys 頁面重新建立一把新金鑰（新建的都是 AQ. 開頭的授權金鑰），再貼一次。");
+    if(res.status === 403 || /API key not valid|permission/i.test(msg))
+      throw new Error("金鑰沒有權限。請確認複製完整、沒有多餘空格，或改用新建立的金鑰。");
+    if(res.status === 429) throw new Error("免費額度暫時用完了，等一段時間再試。");
+    throw lastErr;
   }
   throw lastErr || new Error("呼叫失敗，請稍後再試。");
 }
