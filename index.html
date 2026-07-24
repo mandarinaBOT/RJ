@@ -199,6 +199,16 @@
     <p class="lede">認識均衡飲食的基礎，讓 AI 幫你規劃每日菜單、看照片估熱量。</p>
   </header>
 
+  <div class="card" id="keyBox" style="display:none;border-color:#F0D9B8;background:#FFFBF4">
+    <h2 style="font-size:16px">🔑 先貼上你的免費金鑰</h2>
+    <p class="sub" style="margin-bottom:12px">到 aistudio.google.com 申請（免費、免信用卡），複製後貼在下面就能開始用。</p>
+    <div class="searchrow">
+      <input type="text" id="keyInput" placeholder="AQ.Ab... 或 AIza..." autocomplete="off" spellcheck="false">
+      <button class="btn" id="keySave">啟用</button>
+    </div>
+    <p class="sub" style="margin:10px 0 0;font-size:12px">只存在這個分頁，重整後要再貼一次。想一勞永逸的話，把金鑰寫進原始碼的 GEMINI_API_KEY 那一行。</p>
+  </div>
+
   <nav class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="learn"><span class="ico">📖</span>飲食知識</button>
     <button role="tab" aria-selected="false" data-tab="menu"><span class="ico">📝</span>菜單建議</button>
@@ -360,7 +370,28 @@ const tagColor = c => COLOR[c] || '#6E7D72';
    ★★★ 只要改這一行 ★★★
    把引號中間換成你在 Google AI Studio 申請的免費金鑰
    =================================================================== */
-const GEMINI_API_KEY = "AQ.Ab8RN6J_uGwjbEtYSUqpMZTthvV9skGxPV-E73WWUFS1LX0Zsg";
+const GEMINI_API_KEY = "在這裡貼上你的金鑰";
+
+/* 也可以直接在網頁上貼金鑰（只保留在這個分頁） */
+let runtimeKey = "";
+function getKey(){
+  const k = (runtimeKey || GEMINI_API_KEY || "").trim();
+  return (!k || k.indexOf("貼上") >= 0) ? "" : k;
+}
+(function initKeyBox(){
+  const box = document.getElementById('keyBox');
+  if(getKey()){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const save = ()=>{
+    const v = document.getElementById('keyInput').value.trim();
+    if(!v) return;
+    runtimeKey = v;
+    workingModel = null;
+    box.innerHTML = '<p class="sub" style="margin:0">✅ 金鑰已啟用，可以開始用 AI 功能了。</p>';
+  };
+  document.getElementById('keySave').addEventListener('click', save);
+  document.getElementById('keyInput').addEventListener('keydown', e=>{ if(e.key==='Enter') save(); });
+})();
 
 /* 免費層可用的模型，會由上往下自動嘗試，找到能用的就記住 */
 const GEMINI_MODELS = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-flash-lite"];
@@ -379,42 +410,61 @@ function toGeminiParts(messages){
   return parts;
 }
 
+/* 新版金鑰（AQ. 開頭）用 x-goog-api-key 標頭送；
+   萬一被瀏覽器擋下，自動退回舊的 ?key= 網址寫法。 */
+let authMode = null;   // 'header' | 'query'
+
+function geminiFetch(model, body, key, mode){
+  let url = "https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent";
+  const headers = {"Content-Type":"application/json"};
+  if(mode === 'header') headers["x-goog-api-key"] = key;
+  else url += "?key=" + encodeURIComponent(key);
+  return fetch(url, {method:"POST", headers:headers, body:JSON.stringify(body)});
+}
+
 async function askAI(messages, maxTokens){
-  if(!GEMINI_API_KEY || GEMINI_API_KEY.indexOf("貼上") >= 0){
-    throw new Error("還沒填入金鑰。請打開網頁原始碼，把 GEMINI_API_KEY 換成你在 Google AI Studio 申請的金鑰。");
+  const key = getKey();
+  if(!key){
+    throw new Error("還沒填入金鑰。請把頁面最上方那個橘色框裡的欄位填上你的 Google AI Studio 金鑰，按「啟用」即可。");
   }
   const body = {
     contents:[{parts: toGeminiParts(messages)}],
     generationConfig:{ maxOutputTokens: maxTokens||2048, temperature:0.9, responseMimeType:"application/json" }
   };
   const tryList = workingModel ? [workingModel] : GEMINI_MODELS;
+  const modes = authMode ? [authMode] : ['header','query'];
   let lastErr = null;
 
-  for(let i=0;i<tryList.length;i++){
-    const model = tryList[i];
-    try{
-      const res = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+encodeURIComponent(GEMINI_API_KEY),
-        { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) }
-      );
-      const data = await res.json().catch(()=>null);
-      if(!res.ok){
-        const msg = (data && data.error && data.error.message) || ("回應代碼 "+res.status);
-        lastErr = new Error(msg);
-        if(res.status === 404 || /not found|not supported/i.test(msg)) continue;  // 換下一個模型
-        if(res.status === 400 && /API key/i.test(msg)) throw new Error("金鑰無效，請確認有完整複製、且沒有多餘空格。");
-        if(res.status === 429) throw new Error("今天的免費額度用完了，等一段時間再試。");
-        throw lastErr;
+  for(let m=0;m<modes.length;m++){
+    const mode = modes[m];
+    for(let i=0;i<tryList.length;i++){
+      const model = tryList[i];
+      let res;
+      try{
+        res = await geminiFetch(model, body, key, mode);
+      }catch(netErr){
+        lastErr = new Error("連線失敗，請確認網路是否正常。");
+        break;   // 這個傳送方式被擋，換下一種
       }
-      const cand = data && data.candidates && data.candidates[0];
-      const text = cand && cand.content && cand.content.parts
-        ? cand.content.parts.map(p=>p.text||"").join("").trim() : "";
-      if(!text) throw new Error("AI 沒有回覆內容，請再試一次。");
-      workingModel = model;
-      return text;
-    }catch(e){
-      lastErr = e;
-      if(!/not found|not supported|回應代碼 404/i.test(e.message||"")) throw e;
+      const data = await res.json().catch(()=>null);
+
+      if(res.ok){
+        const cand = data && data.candidates && data.candidates[0];
+        const text = cand && cand.content && cand.content.parts
+          ? cand.content.parts.map(p=>p.text||"").join("").trim() : "";
+        if(!text){ lastErr = new Error("AI 沒有回覆內容，請再試一次。"); continue; }
+        workingModel = model; authMode = mode;
+        return text;
+      }
+
+      const msg = (data && data.error && data.error.message) || ("回應代碼 "+res.status);
+      lastErr = new Error(msg);
+      if(res.status === 404 || /not found|not supported for/i.test(msg)) continue;          // 換模型
+      if(res.status === 401 || /ACCESS_TOKEN_TYPE_UNSUPPORTED/i.test(msg)) break;           // 換傳送方式
+      if(res.status === 403 || /API key not valid|invalid/i.test(msg))
+        throw new Error("金鑰無法使用。請到 aistudio.google.com 重新建立一把新金鑰，並確認完整複製、沒有多餘空格。");
+      if(res.status === 429) throw new Error("免費額度暫時用完了，等一段時間再試。");
+      break;
     }
   }
   throw lastErr || new Error("呼叫失敗，請稍後再試。");
