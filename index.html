@@ -100,25 +100,6 @@
   .searchrow input{flex:1}
   .searchrow .btn{width:auto;margin-top:0;padding:0 20px;white-space:nowrap;flex:0 0 auto}
 
-  /* ---------- 餐盤分享 ---------- */
-  .banner{background:#FBEEDD;border:1px solid #F0D9B8;color:#92662A;border-radius:12px;padding:10px 13px;font-size:12.5px;margin-bottom:14px;line-height:1.55}
-  .composer{display:flex;flex-direction:column;gap:10px}
-  .namerow{display:flex;gap:10px;align-items:center}
-  .namerow label{font-size:13px;font-weight:700;white-space:nowrap}
-  .posts{display:flex;flex-direction:column;gap:14px;margin-top:18px}
-  .post{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
-  .post .phead{display:flex;align-items:center;gap:9px;padding:11px 14px}
-  .post .ava{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex:0 0 auto}
-  .post .pmeta b{font-size:14px;display:block;line-height:1.25}
-  .post .pmeta span{font-size:11px;color:var(--muted)}
-  .post img.pimg{width:100%;display:block;background:#f0f0ec}
-  .post .pcap{padding:11px 14px;font-size:14px;color:#2f3f35;line-height:1.55}
-  .post .pfoot{display:flex;align-items:center;gap:6px;padding:0 14px 12px}
-  .likebtn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--muted);transition:.15s}
-  .likebtn:hover{border-color:var(--r-red);color:var(--r-red)}
-  .likebtn.on{background:#FBEDEB;border-color:var(--r-red);color:var(--r-red)}
-  .empty{text-align:center;color:var(--muted);padding:36px 10px;font-size:13.5px}
-
   /* ---------- inputs ---------- */
   label.fld{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
   textarea,input[type=text]{
@@ -129,6 +110,7 @@
   .chips{display:flex;flex-wrap:wrap;gap:7px;margin:11px 0 4px}
   .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;color:var(--muted);font-family:inherit;transition:.15s}
   .chip:hover{border-color:var(--brand);color:var(--brand)}
+  .chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
   .btn{
     width:100%;margin-top:14px;border:0;cursor:pointer;font-family:inherit;
     background:var(--brand);color:#fff;font-weight:800;font-size:15px;
@@ -171,6 +153,7 @@
   @keyframes sp{to{transform:rotate(360deg)}}
   .spin.brand{border-color:var(--brand-soft);border-top-color:var(--brand);vertical-align:-3px}
   .err{background:#FBEDEB;border:1px solid #F1C9C3;color:#A83B2E;border-radius:12px;padding:12px 14px;font-size:13.5px;margin-top:12px}
+  .err small{white-space:pre-wrap;word-break:break-word;display:block;margin-top:6px;font-size:12.5px;opacity:.9}
   .note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6}
   @media (max-width:480px){
     h1{font-size:25px}
@@ -196,25 +179,14 @@
       <circle cx="100" cy="100" r="30" fill="none" stroke="#E4E8DD" stroke-width="2"/>
     </svg>
     <h1>彩虹餐盤</h1>
-    <p class="lede">認識均衡飲食的基礎，讓 AI 幫你規劃每日菜單、看照片估熱量。</p>
+    <p class="lede">認識均衡飲食的基礎，規劃每日菜單、記錄熱量、發想料理。</p>
   </header>
-
-  <div class="card" id="keyBox" style="display:none;border-color:#F0D9B8;background:#FFFBF4">
-    <h2 style="font-size:16px">🔑 先貼上你的免費金鑰</h2>
-    <p class="sub" style="margin-bottom:12px">到 aistudio.google.com 申請（免費、免信用卡），複製後貼在下面就能開始用。</p>
-    <div class="searchrow">
-      <input type="text" id="keyInput" placeholder="AQ.Ab... 或 AIza..." autocomplete="off" spellcheck="false">
-      <button class="btn" id="keySave">啟用</button>
-    </div>
-    <p class="sub" style="margin:10px 0 0;font-size:12px">只存在這個分頁，重整後要再貼一次。想一勞永逸的話，把金鑰寫進原始碼的 GEMINI_API_KEY 那一行。</p>
-  </div>
 
   <nav class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="learn"><span class="ico">📖</span>飲食知識</button>
     <button role="tab" aria-selected="false" data-tab="menu"><span class="ico">📝</span>菜單建議</button>
-    <button role="tab" aria-selected="false" data-tab="photo"><span class="ico">📷</span>拍照分析</button>
+    <button role="tab" aria-selected="false" data-tab="photo"><span class="ico">📷</span>熱量記錄</button>
     <button role="tab" aria-selected="false" data-tab="idea"><span class="ico">🍳</span>食材發想</button>
-    <button role="tab" aria-selected="false" data-tab="share"><span class="ico">🍽️</span>餐盤分享</button>
   </nav>
 
   <!-- ============ 飲食知識 ============ -->
@@ -260,16 +232,19 @@
   <section role="tabpanel" id="menu" hidden>
     <div class="card">
       <h2>每日菜單建議</h2>
-      <p class="sub">說說你的需求，AI 依均衡原則排一天的菜單。</p>
-      <label class="fld" for="needs">你的需求</label>
-      <textarea id="needs" rows="3" placeholder="例如：想增肌、一天約 2000 大卡、不吃牛肉、午餐想帶便當…"></textarea>
-      <div class="chips" id="needChips">
-        <button class="chip">減脂 1500 大卡</button>
-        <button class="chip">增肌高蛋白</button>
-        <button class="chip">純素</button>
-        <button class="chip">少油少鹽</button>
-        <button class="chip">外食族</button>
-        <button class="chip">控制血糖</button>
+      <p class="sub">選好目標與飲食限制，一次排出兩組均衡菜單，挑喜歡的用。</p>
+      <label class="fld">今天的目標</label>
+      <div class="chips" id="goalChips">
+        <button class="chip on" data-goal="均衡">均衡飲食</button>
+        <button class="chip" data-goal="減脂">減脂</button>
+        <button class="chip" data-goal="增肌">增肌</button>
+      </div>
+      <label class="fld" style="margin-top:14px">飲食限制（可複選）</label>
+      <div class="chips" id="restrChips">
+        <button class="chip" data-restr="beef">不吃牛</button>
+        <button class="chip" data-restr="pork">不吃豬</button>
+        <button class="chip" data-restr="veg">蛋奶素</button>
+        <button class="chip" data-restr="oily">少油</button>
       </div>
       <button class="btn" id="menuBtn">生成今日菜單</button>
       <div id="menuOut"></div>
@@ -279,15 +254,18 @@
   <!-- ============ 拍照分析 ============ -->
   <section role="tabpanel" id="photo" hidden>
     <div class="card">
-      <h2>拍照估熱量</h2>
-      <p class="sub">上傳一餐的照片，AI 估算熱量與營養均衡，給你調整建議。</p>
+      <h2>餐點記錄・熱量</h2>
+      <p class="sub">點選這餐吃了什麼，馬上算出熱量與均衡。也可以先拍張照留紀錄。</p>
       <div class="drop" id="drop">
         <div class="big">📷</div>
-        <p><b>點此上傳餐點照片</b></p>
-        <p>JPG / PNG，看得清楚食物即可</p>
+        <p><b>拍照留紀錄（可略過）</b></p>
+        <p>只是留個影像，不影響計算</p>
       </div>
       <input type="file" id="file" accept="image/*" hidden>
       <div id="photoArea"></div>
+      <label class="fld" style="margin-top:16px">這餐吃了什麼？</label>
+      <div id="foodCats"></div>
+      <div id="plateOut"></div>
     </div>
   </section>
 
@@ -295,7 +273,7 @@
   <section role="tabpanel" id="idea" hidden>
     <div class="card">
       <h2>食材發想</h2>
-      <p class="sub">手邊有什麼食材？選一個基本款，或自己輸入，AI 給你幾道輕料理。</p>
+      <p class="sub">手邊有什麼食材？點一個基本款，馬上給你四道輕料理。</p>
       <label class="fld">食材基本盤</label>
       <div class="ingredients" id="ingGrid">
         <button class="ing" data-ing="雞肉"><span class="ie">🍗</span><b>雞肉</b></button>
@@ -308,39 +286,23 @@
         <button class="ing" data-ing="蝦"><span class="ie">🦐</span><b>蝦</b></button>
         <button class="ing" data-ing="魚類"><span class="ie">🐟</span><b>魚類</b></button>
         <button class="ing" data-ing="豆腐"><span class="ie">🍥</span><b>豆腐</b></button>
+        <button class="ing" data-ing="高麗菜"><span class="ie">🥬</span><b>高麗菜</b></button>
+        <button class="ing" data-ing="花椰菜"><span class="ie">🥦</span><b>花椰菜</b></button>
+        <button class="ing" data-ing="香菇"><span class="ie">🍄</span><b>香菇</b></button>
+        <button class="ing" data-ing="紅蘿蔔"><span class="ie">🥕</span><b>紅蘿蔔</b></button>
+        <button class="ing" data-ing="玉米"><span class="ie">🌽</span><b>玉米</b></button>
+        <button class="ing" data-ing="茄子"><span class="ie">🍆</span><b>茄子</b></button>
+        <button class="ing" data-ing="青椒"><span class="ie">🫑</span><b>青椒</b></button>
+        <button class="ing" data-ing="洋蔥"><span class="ie">🧅</span><b>洋蔥</b></button>
+        <button class="ing" data-ing="酪梨"><span class="ie">🥑</span><b>酪梨</b></button>
+        <button class="ing" data-ing="地瓜"><span class="ie">🍠</span><b>地瓜</b></button>
       </div>
-      <label class="fld" for="ingInput" style="margin-top:18px">搜尋其他食材</label>
+      <label class="fld" for="ingInput" style="margin-top:18px">或輸入食材名稱查詢</label>
       <div class="searchrow">
-        <input type="text" id="ingInput" placeholder="例如：高麗菜、香菇、鮭魚…">
-        <button class="btn" id="ingBtn">發想</button>
+        <input type="text" id="ingInput" placeholder="例如：雞肉、番茄、豆腐…">
+        <button class="btn" id="ingBtn">查詢</button>
       </div>
       <div id="ideaOut"></div>
-    </div>
-  </section>
-
-  <!-- ============ 餐盤分享 ============ -->
-  <section role="tabpanel" id="share" hidden>
-    <div class="card">
-      <h2>餐盤分享</h2>
-      <p class="sub">上傳今天的餐盤，跟線上的大家分享你的健康飲食。</p>
-      <div id="shareBanner"></div>
-      <div class="composer">
-        <div class="namerow">
-          <label for="userName">暱稱</label>
-          <input type="text" id="userName" maxlength="16" placeholder="你的暱稱">
-        </div>
-        <div class="drop" id="shareDrop">
-          <div class="big">🍱</div>
-          <p><b>點此選擇餐盤照片</b></p>
-          <p>會自動壓縮後再上傳</p>
-        </div>
-        <input type="file" id="shareFile" accept="image/*" hidden>
-        <img id="sharePreview" class="preview" style="display:none" alt="預覽">
-        <textarea id="shareCap" rows="2" placeholder="說點什麼…今天吃了什麼好料？"></textarea>
-        <button class="btn" id="postBtn" disabled>發布貼文</button>
-        <div id="shareErr"></div>
-      </div>
-      <div class="posts" id="feed"></div>
     </div>
   </section>
 
@@ -350,12 +312,10 @@
   </p>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 /* ---------------- 分頁切換 ---------------- */
 const tabs = document.querySelectorAll('nav.tabs button');
-const panels = {learn:document.getElementById('learn'), menu:document.getElementById('menu'), photo:document.getElementById('photo'), idea:document.getElementById('idea'), share:document.getElementById('share')};
+const panels = {learn:document.getElementById('learn'), menu:document.getElementById('menu'), photo:document.getElementById('photo'), idea:document.getElementById('idea')};
 tabs.forEach(t=>t.addEventListener('click',()=>{
   tabs.forEach(x=>x.setAttribute('aria-selected', x===t?'true':'false'));
   Object.entries(panels).forEach(([k,p])=>p.hidden = (k!==t.dataset.tab));
@@ -366,162 +326,140 @@ tabs.forEach(t=>t.addEventListener('click',()=>{
 const COLOR = {'紅':'#E2574C','橙':'#E89B3B','橙黃':'#E89B3B','黃':'#F0C238','綠':'#5BA053','藍':'#8E6FB0','紫':'#8E6FB0','藍紫':'#8E6FB0','白':'#C7B79A'};
 const tagColor = c => COLOR[c] || '#6E7D72';
 
-/* ===================================================================
-   ★★★ 只要改這一行 ★★★
-   把引號中間換成你在 Google AI Studio 申請的免費金鑰
-   =================================================================== */
-const GEMINI_API_KEY = "AQ.Ab8RN6LGBxIbk4SW6qSF_8ta9ARlmd4UafQiHgq5cZ27cf5aTg";
-
-/* 也可以直接在網頁上貼金鑰（只保留在這個分頁） */
-let runtimeKey = "";
-function getKey(){
-  const k = (runtimeKey || GEMINI_API_KEY || "").trim();
-  return (!k || k.indexOf("貼上") >= 0) ? "" : k;
-}
-(function initKeyBox(){
-  const box = document.getElementById('keyBox');
-  if(getKey()){ box.style.display = 'none'; return; }
-  box.style.display = 'block';
-  const save = ()=>{
-    const v = document.getElementById('keyInput').value.trim();
-    if(!v) return;
-    runtimeKey = v;
-    workingModel = null;
-    box.innerHTML = '<p class="sub" style="margin:0">✅ 金鑰已啟用，可以開始用 AI 功能了。</p>';
-  };
-  document.getElementById('keySave').addEventListener('click', save);
-  document.getElementById('keyInput').addEventListener('keydown', e=>{ if(e.key==='Enter') save(); });
-})();
-
-/* 免費層可用的模型，會由上往下自動嘗試，找到能用的就記住 */
-/* 免費層可用的模型，會由上往下自動嘗試，找到能用的就記住 */
-const GEMINI_MODELS = ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite"];
-let workingModel = null;
-
-/* 把 Anthropic 格式的訊息轉成 Interactions API 的 input 陣列。
-   官方建議文字放在圖片前面，所以這裡會自動排序。 */
-function toGeminiInput(messages){
-  const texts = [], images = [];
-  (messages||[]).forEach(m=>{
-    if(typeof m.content === 'string'){ texts.push({type:"text", text:m.content}); return; }
-    (m.content||[]).forEach(b=>{
-      if(b.type === 'text') texts.push({type:"text", text:b.text});
-      else if(b.type === 'image' && b.source)
-        images.push({type:"image", data:b.source.data, mime_type:b.source.media_type});
-    });
-  });
-  return texts.concat(images);
-}
-
-/* 從回應中取出文字：優先抓 model_output，抓不到再整包掃一遍 */
-function pullText(node){
-  let out = "";
-  (function walk(n){
-    if(!n || typeof n !== 'object') return;
-    if(Array.isArray(n)){ n.forEach(walk); return; }
-    if(typeof n.text === 'string'){ out += n.text; return; }
-    for(const k in n) walk(n[k]);
-  })(node);
-  return out.trim();
-}
-function extractText(data){
-  if(!data) return "";
-  if(typeof data.output_text === 'string' && data.output_text.trim()) return data.output_text.trim();
-  const steps = data.steps || data.Steps;
-  if(Array.isArray(steps)){
-    let out = "";
-    steps.forEach(s=>{
-      const mo = s && (s.model_output || s.modelOutput);
-      if(mo) out += pullText(mo);
-    });
-    if(out.trim()) return out.trim();
-  }
-  return pullText(data);
-}
-
-async function askAI(messages, maxTokens){
-  const key = getKey();
-  if(!key){
-    throw new Error("還沒填入金鑰。請把頁面最上方那個橘色框裡的欄位填上你的 Google AI Studio 金鑰，按「啟用」即可。");
-  }
-  const input = toGeminiInput(messages);
-  const tryList = workingModel ? [workingModel] : GEMINI_MODELS;
-  let lastErr = null;
-
-  for(let i=0;i<tryList.length;i++){
-    const model = tryList[i];
-    let res;
-    try{
-      res = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions",{
-        method:"POST",
-        headers:{ "Content-Type":"application/json", "x-goog-api-key": key },
-        body:JSON.stringify({
-          model: model,
-          input: input,
-          store: false,
-          response_format:{ type:"text", mime_type:"application/json" },
-          generation_config:{ temperature:0.9, max_output_tokens: maxTokens||2048 }
-        })
-      });
-    }catch(netErr){
-      throw new Error("連線失敗，請確認網路是否正常。");
-    }
-
-    const data = await res.json().catch(()=>null);
-
-    if(res.ok){
-      const text = extractText(data);
-      if(!text){ lastErr = new Error("AI 沒有回覆內容，請再試一次。"); continue; }
-      workingModel = model;
-      return text;
-    }
-
-    const msg = (data && data.error && data.error.message) || ("回應代碼 "+res.status);
-    lastErr = new Error(msg);
-    if(res.status === 404 || /not found|not supported|invalid model/i.test(msg)) continue;   // 換模型
-    if(res.status === 401 || /ACCESS_TOKEN_TYPE_UNSUPPORTED|invalid authentication/i.test(msg))
-      throw new Error("金鑰無法通過驗證。請到 aistudio.google.com 的 API Keys 頁面重新建立一把新金鑰（新建的都是 AQ. 開頭的授權金鑰），再貼一次。");
-    if(res.status === 403 || /API key not valid|permission/i.test(msg))
-      throw new Error("金鑰沒有權限。請確認複製完整、沒有多餘空格，或改用新建立的金鑰。");
-    if(res.status === 429) throw new Error("免費額度暫時用完了，等一段時間再試。");
-    throw lastErr;
-  }
-  throw lastErr || new Error("呼叫失敗，請稍後再試。");
-}
-function parseJSON(txt){
-  const clean = txt.replace(/```json/gi,"").replace(/```/g,"").trim();
-  const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
-  return JSON.parse(s>=0 ? clean.slice(s,e+1) : clean);
-}
-
 /* ---------------- 菜單建議 ---------------- */
-document.querySelectorAll('#needChips .chip').forEach(c=>c.addEventListener('click',()=>{
-  const ta=document.getElementById('needs');
-  ta.value = (ta.value.trim()? ta.value.trim()+'、':'') + c.textContent;
-  ta.focus();
+/* ---------------- 菜單建議（內建菜庫，免金鑰） ---------------- */
+document.querySelectorAll('#goalChips .chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('#goalChips .chip').forEach(x=>x.classList.toggle('on', x===c));
 }));
+document.querySelectorAll('#restrChips .chip').forEach(c=>c.addEventListener('click',()=>{
+  c.classList.toggle('on');
+}));
+function currentGoal(){ const el=document.querySelector('#goalChips .chip.on'); return el?el.dataset.goal:'均衡'; }
+function currentRestr(){ const r={}; document.querySelectorAll('#restrChips .chip.on').forEach(c=>r[c.dataset.restr]=true); return r; }
+
+const MEAL_DB = {
+  breakfast:[
+    {name:"全麥蛋三明治",items:["全麥吐司","水煮蛋","生菜番茄"],kcal:320,goals:["均衡","增肌"],veg:true,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["紅","綠"]},
+    {name:"燕麥牛奶莓果碗",items:["燕麥","低脂牛奶","藍莓","香蕉"],kcal:300,goals:["均衡","減脂"],veg:true,groups:["全榖雜糧","乳品","水果"],colors:["藍紫","黃"]},
+    {name:"地瓜配無糖豆漿",items:["蒸地瓜","無糖豆漿","水煮蛋"],kcal:290,goals:["減脂","增肌"],veg:true,groups:["全榖雜糧","豆魚蛋肉"],colors:["橙"]},
+    {name:"鮪魚蔬菜蛋餅",items:["蛋餅皮","鮪魚","高麗菜"],kcal:350,goals:["增肌","均衡"],veg:false,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["綠"]},
+    {name:"優格水果堅果杯",items:["無糖優格","綜合莓果","少許堅果"],kcal:260,goals:["減脂","均衡"],veg:true,groups:["乳品","水果","油脂與堅果"],colors:["紅","藍紫"]},
+    {name:"蔬菜歐姆蛋",items:["雞蛋","菠菜","洋菇"],kcal:240,goals:["減脂","增肌"],veg:true,groups:["豆魚蛋肉","蔬菜"],colors:["綠","白"]}
+  ],
+  lunch:[
+    {name:"蒜香雞胸糙米飯",items:["糙米飯","蒜香雞胸","燙青花菜"],kcal:480,goals:["增肌","均衡"],veg:false,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["綠"]},
+    {name:"番茄牛肉麵（少油）",items:["麵","番茄牛腱","青江菜"],kcal:520,goals:["均衡"],beef:true,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["紅","綠"]},
+    {name:"豆腐蔬菜蓋飯",items:["糙米飯","滷豆腐","什錦蔬菜"],kcal:430,goals:["減脂","均衡"],veg:true,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["綠","橙"]},
+    {name:"清蒸魚便當",items:["白飯","清蒸魚","炒時蔬"],kcal:470,goals:["均衡","增肌"],veg:false,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["綠","白"]},
+    {name:"蝦仁蔬菜炒烏龍",items:["烏龍麵","蝦仁","彩椒高麗菜"],kcal:460,goals:["均衡"],veg:false,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["紅","綠"]},
+    {name:"和風雞肉沙拉附餐包",items:["大量生菜","雞胸","小餐包"],kcal:380,goals:["減脂"],veg:false,groups:["蔬菜","豆魚蛋肉","全榖雜糧"],colors:["綠","紅"]},
+    {name:"青椒肉絲蓋飯",items:["白飯","豬肉絲","青椒"],kcal:500,goals:["均衡","增肌"],pork:true,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["綠"]}
+  ],
+  dinner:[
+    {name:"蒜蓉蒸蝦配藜麥",items:["藜麥","蒜蓉蒸蝦","燙蘆筍"],kcal:400,goals:["減脂","增肌"],veg:false,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["綠"]},
+    {name:"味噌魚湯定食",items:["糙米飯","味噌魚豆腐湯","涼拌菠菜"],kcal:430,goals:["均衡"],veg:false,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["綠","白"]},
+    {name:"番茄豆腐煲配飯",items:["白飯","番茄豆腐煲","炒青菜"],kcal:410,goals:["減脂","均衡"],veg:true,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["紅","綠"]},
+    {name:"去皮雞腿排佐地瓜",items:["蒸地瓜","去皮雞腿","綜合生菜"],kcal:460,goals:["增肌","均衡"],veg:false,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["橙","綠"]},
+    {name:"什錦蔬菜豆腐鍋",items:["豆腐","大量蔬菜","菇類","冬粉"],kcal:350,goals:["減脂"],veg:true,groups:["豆魚蛋肉","蔬菜","全榖雜糧"],colors:["綠","白","橙"]},
+    {name:"薑燒豬肉定食",items:["糙米飯","薑燒里肌","高麗菜絲"],kcal:490,goals:["均衡","增肌"],pork:true,groups:["全榖雜糧","豆魚蛋肉","蔬菜"],colors:["綠"]}
+  ],
+  snack:[
+    {name:"水煮蛋＋一顆蘋果",items:["水煮蛋","蘋果"],kcal:160,goals:["減脂","均衡"],veg:true,groups:["豆魚蛋肉","水果"],colors:["紅"]},
+    {name:"無糖優格＋藍莓",items:["無糖優格","藍莓"],kcal:130,goals:["減脂","均衡"],veg:true,groups:["乳品","水果"],colors:["藍紫"]},
+    {name:"一小把綜合堅果",items:["綜合堅果"],kcal:170,goals:["均衡","增肌"],veg:true,groups:["油脂與堅果"],colors:[]},
+    {name:"水煮毛豆一份",items:["水煮毛豆"],kcal:140,goals:["減脂","增肌"],veg:true,groups:["豆魚蛋肉"],colors:["綠"]},
+    {name:"香蕉＋無糖豆漿",items:["香蕉","無糖豆漿"],kcal:190,goals:["增肌","均衡"],veg:true,groups:["水果","豆魚蛋肉"],colors:["黃"]}
+  ]
+};
+const GOAL_TARGET = {
+  "減脂":{breakfast:290,lunch:430,dinner:390,snack:140},
+  "均衡":{breakfast:330,lunch:490,dinner:440,snack:160},
+  "增肌":{breakfast:350,lunch:540,dinner:500,snack:190}
+};
+
+function allowed(d, restr){
+  if(restr.beef && d.beef) return false;
+  if(restr.pork && d.pork) return false;
+  if(restr.veg  && !d.veg) return false;
+  if(restr.oily && d.oily) return false;
+  return true;
+}
+function pickMeal(pool, goal, target, restr){
+  let cands = pool.filter(d=>allowed(d, restr));
+  if(!cands.length) return null;
+  const byGoal = cands.filter(d=>d.goals.indexOf(goal)>=0);
+  if(byGoal.length) cands = byGoal;
+  cands.sort((a,b)=>Math.abs(a.kcal-target)-Math.abs(b.kcal-target));
+  const top = cands.slice(0, Math.min(3, cands.length));
+  return top[Math.floor(Math.random()*top.length)];
+}
 
 const menuBtn = document.getElementById('menuBtn');
-menuBtn.addEventListener('click', async ()=>{
-  const needs = document.getElementById('needs').value.trim();
+function assembleMenu(goal, restr){
+  const target = GOAL_TARGET[goal];
+  const order = [["早餐","breakfast"],["午餐","lunch"],["晚餐","dinner"],["點心","snack"]];
+  const meals = [];
+  let total = 0, missing = false;
+  order.forEach(([label,key])=>{
+    const d = pickMeal(MEAL_DB[key], goal, target[key], restr);
+    if(!d){ missing = true; return; }
+    total += d.kcal;
+    meals.push({type:label, name:d.name, items:d.items, calories:d.kcal, colors:d.colors, groups:d.groups});
+  });
+  if(!meals.length) return null;
+  const goalTip = {
+    "減脂":"以原型食物為主、少油少糖，餐間會餓可用清單裡的點心墊一下。",
+    "均衡":"三大類（主食、蛋白質、蔬菜）都齊全，記得多喝水。",
+    "增肌":"蛋白質分配到每一餐吸收較好，訓練後可再補一份點心。"
+  }[goal];
+  const tips = [goalTip, "這是概估份量，可依你的食量與活動量微調。"];
+  if(missing) tips.push("部分餐次因限制較多而略過了。");
+  return {
+    summary:"為「"+goal+"」目標排的一天"+(Object.keys(restr).length?"（已套用你的飲食限制）":""),
+    totalCalories: total, meals: meals, tips: tips
+  };
+}
+
+let menuSets = [], activeSet = 0;
+function menusEqual(a,b){
+  return a && b && a.meals.map(m=>m.name).join('|') === b.meals.map(m=>m.name).join('|');
+}
+function renderMenuUI(){
   const out = document.getElementById('menuOut');
-  if(!needs){ out.innerHTML = '<div class="err">先說說你的需求，例如熱量、飲食偏好或目標。</div>'; return; }
-  menuBtn.disabled = true;
-  menuBtn.innerHTML = '<span class="spin"></span>規劃中…';
-  out.innerHTML = '';
-  const prompt = `你是均衡飲食的營養顧問。依使用者需求，設計「一天」的飲食菜單，強調六大類均衡與彩虹蔬果多樣性，避免極端節食。`+
-    `使用者需求：「${needs}」。\n`+
-    `只回傳 JSON，不要任何說明文字或 markdown。格式：\n`+
-    `{"summary":"一句話特色","totalCalories":整數,"meals":[{"type":"早餐","name":"餐點名","items":["品項1","品項2"],"calories":整數,"colors":["紅","綠"],"groups":["蔬菜","全榖雜糧"]}],"tips":["建議1","建議2"]}\n`+
-    `meals 請含早餐、午餐、晚餐，可加一個點心。colors 用顏色字（紅/橙/黃/綠/藍紫/白）。groups 用六大類名稱。全部用繁體中文。`;
-  try{
-    const data = parseJSON(await askAI([{role:"user",content:prompt}], 2000));
-    renderMenu(data, out);
-  }catch(e){
-    out.innerHTML = '<div class="err">產生菜單時出了點問題，請再試一次。<br><small>'+(e.message||e)+'</small></div>';
-  }finally{
-    menuBtn.disabled = false; menuBtn.textContent = '重新生成菜單';
+  if(!menuSets.length){ out.innerHTML=''; return; }
+  let h = '';
+  if(menuSets.length > 1){
+    h += '<div class="chips" style="margin:16px 0 4px">';
+    menuSets.forEach((_,i)=> h += '<button class="chip'+(i===activeSet?' on':'')+'" data-set="'+i+'">方案 '+(i+1)+'</button>');
+    h += '</div>';
   }
+  h += '<div id="menuBody"></div>';
+  out.innerHTML = h;
+  out.querySelectorAll('[data-set]').forEach(b=>b.addEventListener('click',()=>{
+    activeSet = +b.dataset.set;
+    out.querySelectorAll('[data-set]').forEach(x=>x.classList.toggle('on', x===b));
+    renderMenu(menuSets[activeSet], document.getElementById('menuBody'));
+  }));
+  renderMenu(menuSets[activeSet], document.getElementById('menuBody'));
+}
+
+menuBtn.addEventListener('click', ()=>{
+  const out = document.getElementById('menuOut');
+  const goal = currentGoal();
+  const restr = currentRestr();
+  const a = assembleMenu(goal, restr);
+  if(!a){
+    menuSets = [];
+    out.innerHTML = '<div class="err">這些限制下暫時排不出菜單，試著放寬一項再生成。</div>';
+    return;
+  }
+  // 產生第二組，盡量與第一組不同
+  let b = null;
+  for(let t=0;t<6;t++){ const cand = assembleMenu(goal, restr); if(cand && !menusEqual(a,cand)){ b = cand; break; } }
+  menuSets = b ? [a, b] : [a];
+  activeSet = 0;
+  renderMenuUI();
+  menuBtn.textContent = '重新生成兩組';
 });
 
 function renderMenu(d, out){
@@ -545,111 +483,263 @@ function renderMenu(d, out){
   out.innerHTML = h;
 }
 
-/* ---------------- 拍照分析 ---------------- */
+/* ---------------- 熱量記錄（免金鑰） ---------------- */
 const drop = document.getElementById('drop');
 const fileInput = document.getElementById('file');
 const photoArea = document.getElementById('photoArea');
-let imgB64 = null, imgType = 'image/jpeg';
 
 drop.addEventListener('click', ()=>fileInput.click());
 fileInput.addEventListener('change', e=>{
   const f = e.target.files[0]; if(!f) return;
-  imgType = f.type || 'image/jpeg';
   const reader = new FileReader();
   reader.onload = ()=>{
-    imgB64 = reader.result.split(',')[1];
     photoArea.innerHTML =
-      '<img class="preview" src="'+reader.result+'" alt="餐點預覽">'+
-      '<button class="btn" id="anaBtn" style="margin-top:12px">分析這一餐</button>'+
-      '<button class="btn ghost" id="reBtn">換一張</button>';
-    document.getElementById('anaBtn').addEventListener('click', analyze);
+      '<img class="preview" src="'+reader.result+'" alt="餐點照片">'+
+      '<button class="btn ghost" id="reBtn" style="margin-top:10px">換一張</button>';
     document.getElementById('reBtn').addEventListener('click', ()=>{ fileInput.value=''; fileInput.click(); });
   };
   reader.readAsDataURL(f);
 });
 
-async function analyze(){
-  const btn = document.getElementById('anaBtn');
-  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>分析中…';
-  const old = photoArea.querySelector('#result'); if(old) old.remove();
-  const prompt = `你是均衡飲食顧問。看這張餐點照片，估算熱量與營養均衡，給實用且正向的調整建議，強調均衡與多樣，不鼓勵極端節食。`+
-    `只回傳 JSON，不要任何說明或 markdown。格式：\n`+
-    `{"dishName":"推測餐點","foods":["食物1","食物2"],"totalCalories":整數,"range":"500-650","groups":[{"name":"蔬菜","level":"足夠"}],"rainbow":["紅","綠"],"balance":"整體均衡一句話","suggestions":["建議1","建議2"]}\n`+
-    `level 只能是「足夠」「偏少」或「偏多」。rainbow 用顏色字。全部繁體中文。`;
-  try{
-    const txt = await askAI([{role:"user",content:[
-      {type:"image",source:{type:"base64",media_type:imgType,data:imgB64}},
-      {type:"text",text:prompt}
-    ]}], 1500);
-    renderPhoto(parseJSON(txt));
-  }catch(e){
-    const div=document.createElement('div'); div.id='result';
-    div.innerHTML = '<div class="err">分析失敗，換張清楚一點的照片再試。<br><small>'+(e.message||e)+'</small></div>';
-    photoArea.appendChild(div);
-  }finally{
-    btn.disabled = false; btn.textContent = '重新分析';
-  }
+const FOOD_DB = {
+  "主食":[
+    {n:"白飯一碗",k:280,g:"全榖雜糧"},{n:"糙米飯一碗",k:250,g:"全榖雜糧"},
+    {n:"麵一份",k:300,g:"全榖雜糧"},{n:"吐司兩片",k:150,g:"全榖雜糧"},
+    {n:"地瓜一條",k:130,g:"全榖雜糧",c:"橙"}
+  ],
+  "蛋白質":[
+    {n:"雞胸肉",k:150,g:"豆魚蛋肉"},{n:"水煮蛋",k:70,g:"豆魚蛋肉"},
+    {n:"豆腐一塊",k:120,g:"豆魚蛋肉"},{n:"魚一片",k:160,g:"豆魚蛋肉"},
+    {n:"蝦數隻",k:90,g:"豆魚蛋肉"},{n:"牛肉一份",k:250,g:"豆魚蛋肉"},
+    {n:"豬肉一份",k:230,g:"豆魚蛋肉"}
+  ],
+  "蔬菜":[
+    {n:"燙青菜",k:40,g:"蔬菜",c:"綠"},{n:"番茄",k:30,g:"蔬菜",c:"紅"},
+    {n:"花椰菜",k:45,g:"蔬菜",c:"綠"},{n:"菇類",k:35,g:"蔬菜",c:"白"},
+    {n:"紫高麗菜",k:35,g:"蔬菜",c:"藍紫"},{n:"胡蘿蔔",k:40,g:"蔬菜",c:"橙"}
+  ],
+  "水果":[
+    {n:"蘋果",k:90,g:"水果",c:"紅"},{n:"香蕉",k:100,g:"水果",c:"黃"},
+    {n:"藍莓",k:60,g:"水果",c:"藍紫"},{n:"芭樂",k:70,g:"水果",c:"綠"}
+  ],
+  "乳品・其他":[
+    {n:"牛奶一杯",k:130,g:"乳品",c:"白"},{n:"無糖優格",k:90,g:"乳品",c:"白"},
+    {n:"堅果一把",k:170,g:"油脂與堅果"},{n:"含糖飲料",k:150,g:"其他"}
+  ]
+};
+
+let plate = [];
+function renderFoodCats(){
+  let h='';
+  Object.keys(FOOD_DB).forEach(cat=>{
+    h+='<div style="margin-bottom:10px"><div class="sub" style="margin:0 0 6px;font-weight:700;color:var(--ink)">'+esc(cat)+'</div><div class="chips" style="margin:0">';
+    FOOD_DB[cat].forEach((f,idx)=>{
+      h+='<button class="chip" data-cat="'+esc(cat)+'" data-idx="'+idx+'">'+esc(f.n)+' <span style="opacity:.55">'+f.k+'</span></button>';
+    });
+    h+='</div></div>';
+  });
+  const box=document.getElementById('foodCats');
+  box.innerHTML=h;
+  box.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
+    plate.push(FOOD_DB[b.dataset.cat][+b.dataset.idx]); renderPlate();
+  }));
 }
 
-function levelClass(l){ return l==='偏少'?'lv-low':(l==='偏多'?'lv-high':'lv-ok'); }
-function renderPhoto(d){
-  let h = '<div class="card" style="margin:14px 0 0;box-shadow:none;border-color:var(--brand-soft)">';
-  if(d.dishName) h += '<h2 style="font-size:17px">'+esc(d.dishName)+'</h2>';
-  if(d.foods&&d.foods.length) h += '<p class="sub">辨識到：'+d.foods.map(esc).join('、')+'</p>';
-  if(d.totalCalories) h += '<div class="total"><span>這一餐約</span><span class="num">'+d.totalCalories+
-       ' <span style="font-size:13px">大卡</span></span></div>';
-  if(d.range) h += '<p class="sub" style="margin-top:-6px">估計區間 '+esc(d.range)+' 大卡</p>';
-  if(d.groups&&d.groups.length){
-    h += '<b style="font-size:14px">營養均衡</b>';
-    d.groups.forEach(g=>{ h += '<div class="meter"><span class="ml">'+esc(g.name)+
-      '</span><span class="lvl-tag '+levelClass(g.level)+'">'+esc(g.level)+'</span></div>'; });
+function renderPlate(){
+  const out=document.getElementById('plateOut');
+  if(!plate.length){ out.innerHTML=''; return; }
+  let total=0; const groups={}, colors={};
+  plate.forEach(f=>{ total+=f.k; groups[f.g]=true; if(f.c) colors[f.c]=true; });
+
+  let h='<div class="card" style="margin:14px 0 0;box-shadow:none;border-color:var(--brand-soft)">';
+  h+='<b style="font-size:14px">這一餐</b><div class="tags" style="margin:8px 0 12px">';
+  plate.forEach((f,i)=> h+='<button class="tag" style="background:#6E7D72;border:0;cursor:pointer" data-rm="'+i+'">'+esc(f.n)+' ✕</button>');
+  h+='</div>';
+  h+='<div class="total"><span>這一餐約</span><span class="num">'+total+' <span style="font-size:13px">大卡</span></span></div>';
+
+  h+='<b style="font-size:14px">涵蓋類別與顏色</b><div class="tags" style="margin:8px 0 4px">';
+  Object.keys(groups).forEach(g=>{ if(g!=='其他') h+='<span class="tag grp">'+esc(g)+'</span>'; });
+  Object.keys(colors).forEach(c=> h+='<span class="tag" style="background:'+tagColor(c)+'">'+esc(c)+'</span>');
+  h+='</div>';
+
+  const tips=[];
+  if(!groups['蔬菜']) tips.push('這餐還沒有蔬菜，加一份深色蔬菜會更均衡。');
+  if(Object.keys(colors).length<3) tips.push('顏色再多一點更好，試著湊到 3 種以上的彩虹蔬果。');
+  if(groups['全榖雜糧']&&groups['豆魚蛋肉']&&groups['蔬菜']) tips.push('主食、蛋白質、蔬菜都有了，均衡度很不錯！');
+  if(total>800) tips.push('這餐熱量偏高，下一餐可以清淡一些。');
+  if(total>0 && total<300) tips.push('這餐偏少，留意整天是否吃得足夠。');
+  if(groups['其他']) tips.push('含糖飲料熱量不低，可以換成無糖或白開水。');
+  if(tips.length) h+='<ul class="tiplist" style="margin-top:10px">'+tips.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>';
+
+  h+='<button class="btn ghost" id="clearPlate" style="margin-top:12px">清空重來</button></div>';
+  out.innerHTML=h;
+  out.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{ plate.splice(+b.dataset.rm,1); renderPlate(); }));
+  document.getElementById('clearPlate').addEventListener('click',()=>{ plate=[]; renderPlate(); });
+}
+renderFoodCats();
+
+/* ---------------- 食材發想（內建菜譜，免金鑰） ---------------- */
+const RECIPES = {
+  "雞肉":{intro:"高蛋白又清爽，雞肉是輕飲食的好夥伴。",dishes:[
+    {name:"蒜香烤雞胸",desc:"雞胸抹蒜末與黑胡椒，烤箱 200 度烤約 15 分鐘。",calories:180,time:"約25分鐘",tags:["高蛋白","低油"]},
+    {name:"涼拌雞絲",desc:"水煮雞胸撕絲，拌小黃瓜與和風醬。",calories:160,time:"約20分鐘",tags:["低卡","清爽"]},
+    {name:"香菇雞湯",desc:"雞腿去皮與香菇燉煮，湯底清淡不油膩。",calories:220,time:"約40分鐘",tags:["暖胃","低油"]},
+    {name:"塔香蒸蛋雞肉",desc:"雞肉末鋪在蛋液上蒸熟，起鍋加九層塔。",calories:200,time:"約20分鐘",tags:["快速","高蛋白"]}
+  ]},
+  "牛肉":{intro:"鐵質豐富，選瘦部位就能吃得清爽。",dishes:[
+    {name:"蔥爆牛肉",desc:"牛肉片配大量青蔥大火快炒，少油。",calories:260,time:"約15分鐘",tags:["快速","下飯"]},
+    {name:"番茄牛肉湯",desc:"牛腱、番茄、洋蔥慢燉出自然甜味。",calories:240,time:"約60分鐘",tags:["暖胃","少油"]},
+    {name:"泰式涼拌牛肉",desc:"燙牛肉片拌檸檬、魚露與香菜。",calories:220,time:"約20分鐘",tags:["清爽","低油"]},
+    {name:"黑胡椒牛柳炒彩椒",desc:"牛柳與彩椒快炒，色彩均衡。",calories:270,time:"約15分鐘",tags:["快速","均衡"]}
+  ]},
+  "豬肉":{intro:"挑里肌或腱子等瘦部位，油脂更少。",dishes:[
+    {name:"蒜泥白肉",desc:"瘦肉水煮切薄片，淋蒜泥醬油。",calories:250,time:"約25分鐘",tags:["經典","少油"]},
+    {name:"豬肉豆腐味噌湯",desc:"瘦豬肉片與豆腐味噌煮成暖湯。",calories:190,time:"約20分鐘",tags:["暖胃","低油"]},
+    {name:"青椒肉絲",desc:"瘦肉絲配青椒少油快炒。",calories:230,time:"約15分鐘",tags:["快速","下飯"]},
+    {name:"薑燒豬肉",desc:"里肌薄片用薑汁醬油煎香。",calories:240,time:"約20分鐘",tags:["快速","高蛋白"]}
+  ]},
+  "番茄":{intro:"茄紅素豐富，煮過更好吸收。",dishes:[
+    {name:"番茄炒蛋",desc:"家常經典，少油版一樣好吃。",calories:180,time:"約10分鐘",tags:["快速","經典"]},
+    {name:"番茄蔬菜湯",desc:"番茄、洋蔥、高麗菜清燉。",calories:90,time:"約30分鐘",tags:["低卡","暖胃"]},
+    {name:"蜂蜜漬小番茄",desc:"小番茄切半淋少許蜂蜜與檸檬。",calories:70,time:"約10分鐘",tags:["清爽","低卡"]},
+    {name:"番茄豆腐煲",desc:"番茄與嫩豆腐一起燉煮。",calories:150,time:"約20分鐘",tags:["低油","暖胃"]}
+  ]},
+  "馬鈴薯":{intro:"優質澱粉，用蒸烤取代油炸最清爽。",dishes:[
+    {name:"香烤薯角",desc:"馬鈴薯切角抹少許油與香料烘烤。",calories:160,time:"約30分鐘",tags:["低油","點心"]},
+    {name:"馬鈴薯燉瘦肉",desc:"馬鈴薯、紅蘿蔔與瘦肉少油慢燉。",calories:250,time:"約40分鐘",tags:["暖胃","均衡"]},
+    {name:"優格馬鈴薯沙拉",desc:"水煮壓泥，用優格取代美乃滋。",calories:180,time:"約25分鐘",tags:["清爽","低油"]},
+    {name:"馬鈴薯蛋餅",desc:"馬鈴薯刨絲加蛋，少油煎成餅。",calories:200,time:"約20分鐘",tags:["快速","飽足"]}
+  ]},
+  "蛋":{intro:"最方便的優質蛋白質，變化多端。",dishes:[
+    {name:"日式蒸蛋",desc:"滑嫩水蒸蛋，加少許柴魚提味。",calories:120,time:"約20分鐘",tags:["低卡","好消化"]},
+    {name:"番茄蛋花湯",desc:"番茄煮軟後打入蛋花，清爽湯品。",calories:100,time:"約15分鐘",tags:["低卡","暖胃"]},
+    {name:"溫泉蛋佐青菜",desc:"溏心蛋配燙青菜，簡單營養。",calories:140,time:"約15分鐘",tags:["高蛋白","清爽"]},
+    {name:"菠菜烘蛋",desc:"菠菜與蛋液少油烘成厚蛋。",calories:170,time:"約20分鐘",tags:["均衡","快速"]}
+  ]},
+  "南瓜":{intro:"天然回甘，β-胡蘿蔔素含量高。",dishes:[
+    {name:"南瓜濃湯",desc:"南瓜蒸熟打泥，加少許牛奶調勻。",calories:150,time:"約30分鐘",tags:["暖胃","低油"]},
+    {name:"原味蒸南瓜",desc:"直接蒸熟，吃它自然的香甜。",calories:90,time:"約20分鐘",tags:["低卡","原型"]},
+    {name:"南瓜雞肉燉飯",desc:"南瓜泥拌少量飯與雞丁，飽足感足。",calories:280,time:"約35分鐘",tags:["飽足","均衡"]},
+    {name:"南瓜蛋沙拉",desc:"蒸南瓜壓泥拌水煮蛋與優格。",calories:190,time:"約25分鐘",tags:["清爽","低油"]}
+  ]},
+  "蝦":{intro:"低脂高蛋白，清蒸水燙最能吃出鮮甜。",dishes:[
+    {name:"蒜蓉蒸蝦",desc:"鮮蝦鋪上蒜末清蒸即可。",calories:120,time:"約15分鐘",tags:["高蛋白","低油"]},
+    {name:"白灼蝦佐莎莎醬",desc:"燙蝦搭配番茄莎莎醬。",calories:130,time:"約15分鐘",tags:["清爽","低卡"]},
+    {name:"蝦仁炒蘆筍",desc:"蝦仁與蘆筍少油快炒。",calories:160,time:"約15分鐘",tags:["快速","均衡"]},
+    {name:"蝦仁蒸蛋",desc:"蝦仁鋪在蛋液上蒸得滑嫩。",calories:150,time:"約20分鐘",tags:["滑嫩","高蛋白"]}
+  ]},
+  "魚類":{intro:"優質蛋白與好油脂，清蒸香煎皆宜。",dishes:[
+    {name:"清蒸鮮魚",desc:"鋪薑蔥清蒸，起鍋淋少許醬油。",calories:180,time:"約20分鐘",tags:["經典","低油"]},
+    {name:"香煎鮭魚",desc:"少油乾煎，撒海鹽與黑胡椒。",calories:240,time:"約15分鐘",tags:["好油脂","高蛋白"]},
+    {name:"味噌魚湯",desc:"白肉魚與豆腐味噌煮成暖湯。",calories:170,time:"約20分鐘",tags:["暖胃","低油"]},
+    {name:"檸檬香草烤魚",desc:"魚片鋪檸檬與香草烘烤。",calories:190,time:"約25分鐘",tags:["清爽","低油"]}
+  ]},
+  "豆腐":{intro:"植物性蛋白，低卡又有飽足感。",dishes:[
+    {name:"皮蛋豆腐",desc:"嫩豆腐配皮蛋，淋醬油與蔥花。",calories:140,time:"約5分鐘",tags:["快速","涼菜"]},
+    {name:"輕量麻婆豆腐",desc:"減少辣油的家常版，一樣下飯。",calories:200,time:"約20分鐘",tags:["下飯","暖胃"]},
+    {name:"味噌豆腐湯",desc:"豆腐與海帶芽味噌湯。",calories:110,time:"約15分鐘",tags:["低卡","暖胃"]},
+    {name:"香煎豆腐佐青菜",desc:"板豆腐少油煎，配燙青菜。",calories:180,time:"約20分鐘",tags:["均衡","低油"]}
+  ]},
+  "高麗菜":{intro:"清甜多纖，怎麼煮都清爽。",dishes:[
+    {name:"手撕高麗菜",desc:"少油快炒，起鍋前灑點蒜末。",calories:80,time:"約10分鐘",tags:["快速","低卡"]},
+    {name:"高麗菜雞肉卷",desc:"燙軟菜葉包雞絞肉蒸熟。",calories:180,time:"約25分鐘",tags:["高蛋白","低油"]},
+    {name:"和風高麗菜沙拉",desc:"刨絲後淋和風醬與白芝麻。",calories:90,time:"約10分鐘",tags:["清爽","涼菜"]},
+    {name:"高麗菜味噌湯",desc:"高麗菜與豆腐煮成清甜味噌湯。",calories:110,time:"約15分鐘",tags:["暖胃","低卡"]}
+  ]},
+  "花椰菜":{intro:"高纖高營養，蒸煮最能留住養分。",dishes:[
+    {name:"蒜香炒花椰",desc:"少油快炒，保留爽脆口感。",calories:100,time:"約12分鐘",tags:["低卡","快速"]},
+    {name:"花椰菜濃湯",desc:"花椰菜蒸熟打泥加少許牛奶。",calories:140,time:"約25分鐘",tags:["暖胃","低油"]},
+    {name:"涼拌花椰菜",desc:"燙熟後拌橄欖油與檸檬。",calories:90,time:"約15分鐘",tags:["清爽","低油"]},
+    {name:"花椰菜烘蛋",desc:"花椰菜與蛋液少油烘熟。",calories:170,time:"約20分鐘",tags:["均衡","高蛋白"]}
+  ]},
+  "香菇":{intro:"鮮味十足，低卡的天然提味聖品。",dishes:[
+    {name:"香菇雞湯",desc:"香菇與去皮雞腿清燉。",calories:200,time:"約40分鐘",tags:["暖胃","低油"]},
+    {name:"清蒸鑲肉香菇",desc:"香菇鑲少量豬絞肉蒸熟。",calories:180,time:"約25分鐘",tags:["高蛋白","低油"]},
+    {name:"奶油炒雙菇",desc:"香菇與鴻喜菇少油炒香。",calories:120,time:"約12分鐘",tags:["快速","低卡"]},
+    {name:"香菇糙米粥",desc:"香菇與糙米煮成清粥。",calories:210,time:"約30分鐘",tags:["好消化","暖胃"]}
+  ]},
+  "紅蘿蔔":{intro:"β-胡蘿蔔素豐富，護眼好幫手。",dishes:[
+    {name:"涼拌紅蘿蔔絲",desc:"刨絲後拌少許鹽與檸檬。",calories:70,time:"約10分鐘",tags:["清爽","低卡"]},
+    {name:"紅蘿蔔炒蛋",desc:"紅蘿蔔絲與蛋少油快炒。",calories:160,time:"約12分鐘",tags:["快速","均衡"]},
+    {name:"紅蘿蔔蔬菜湯",desc:"紅蘿蔔、洋蔥、番茄清燉。",calories:100,time:"約30分鐘",tags:["暖胃","低卡"]},
+    {name:"蒸紅蘿蔔排",desc:"厚切蒸軟，淋少許蜂蜜。",calories:90,time:"約20分鐘",tags:["原型","低油"]}
+  ]},
+  "玉米":{intro:"天然香甜，帶來飽足與纖維。",dishes:[
+    {name:"水煮玉米",desc:"整根水煮，吃它自然的甜。",calories:120,time:"約20分鐘",tags:["原型","低油"]},
+    {name:"玉米蛋花湯",desc:"玉米粒煮軟後打入蛋花。",calories:140,time:"約15分鐘",tags:["暖胃","快速"]},
+    {name:"玉米蔬菜炊飯",desc:"玉米與糙米、蔬菜一起炊。",calories:280,time:"約35分鐘",tags:["飽足","均衡"]},
+    {name:"烤玉米筍",desc:"玉米筍抹少油烘烤。",calories:80,time:"約15分鐘",tags:["低卡","點心"]}
+  ]},
+  "茄子":{intro:"花青素豐富，少油烹調更清爽。",dishes:[
+    {name:"蒸茄子淋醬",desc:"茄子蒸軟，淋蒜末醬油。",calories:90,time:"約15分鐘",tags:["低油","清爽"]},
+    {name:"味噌烤茄子",desc:"茄子抹薄味噌烘烤。",calories:120,time:"約25分鐘",tags:["低油","下飯"]},
+    {name:"茄子燴豆腐",desc:"茄子與豆腐少油燴煮。",calories:170,time:"約20分鐘",tags:["均衡","暖胃"]},
+    {name:"涼拌手撕茄",desc:"蒸熟撕條，拌香菜與醋。",calories:80,time:"約15分鐘",tags:["涼菜","低卡"]}
+  ]},
+  "青椒":{intro:"維生素 C 高，清炒涼拌都爽口。",dishes:[
+    {name:"青椒炒蛋",desc:"青椒絲與蛋少油快炒。",calories:150,time:"約10分鐘",tags:["快速","均衡"]},
+    {name:"涼拌青椒",desc:"燙過後拌蒜末與麻油。",calories:70,time:"約12分鐘",tags:["清爽","低卡"]},
+    {name:"青椒鑲肉",desc:"青椒填少量絞肉蒸熟。",calories:190,time:"約25分鐘",tags:["高蛋白","低油"]},
+    {name:"青椒炒菇",desc:"青椒與香菇少油同炒。",calories:100,time:"約12分鐘",tags:["低卡","快速"]}
+  ]},
+  "洋蔥":{intro:"天然甜味與硫化物，是料理好底味。",dishes:[
+    {name:"洋蔥炒蛋",desc:"洋蔥炒至透明後加蛋。",calories:160,time:"約12分鐘",tags:["快速","均衡"]},
+    {name:"洋蔥牛肉湯",desc:"洋蔥慢煮出甜味，加瘦牛肉。",calories:220,time:"約40分鐘",tags:["暖胃","少油"]},
+    {name:"涼拌洋蔥",desc:"切絲泡冰水去辛，淋和風醬。",calories:80,time:"約15分鐘",tags:["清爽","低卡"]},
+    {name:"烤洋蔥圈",desc:"厚切抹少油烘烤到微焦。",calories:110,time:"約25分鐘",tags:["低油","點心"]}
+  ]},
+  "酪梨":{intro:"優質好油脂，適量吃很健康。",dishes:[
+    {name:"酪梨蛋沙拉",desc:"酪梨壓泥拌水煮蛋。",calories:230,time:"約10分鐘",tags:["好油脂","高蛋白"]},
+    {name:"酪梨全麥吐司",desc:"酪梨泥抹全麥吐司，灑黑胡椒。",calories:260,time:"約8分鐘",tags:["快速","飽足"]},
+    {name:"酪梨鮮蝦沙拉",desc:"酪梨塊與燙蝦拌生菜。",calories:240,time:"約15分鐘",tags:["均衡","清爽"]},
+    {name:"酪梨豆漿昔",desc:"酪梨與無糖豆漿打成昔。",calories:220,time:"約5分鐘",tags:["快速","好油脂"]}
+  ]},
+  "地瓜":{intro:"優質澱粉與纖維，蒸烤最原味。",dishes:[
+    {name:"蒸地瓜",desc:"整條蒸熟，吃它自然的甜。",calories:130,time:"約25分鐘",tags:["原型","低油"]},
+    {name:"地瓜牛奶飲",desc:"蒸地瓜與低脂牛奶打勻。",calories:200,time:"約10分鐘",tags:["飽足","快速"]},
+    {name:"烤地瓜條",desc:"切條抹少油烘烤。",calories:160,time:"約30分鐘",tags:["低油","點心"]},
+    {name:"地瓜燕麥粥",desc:"地瓜丁與燕麥煮成暖粥。",calories:230,time:"約20分鐘",tags:["好消化","暖胃"]}
+  ]}
+};
+const RECIPE_KEYS = Object.keys(RECIPES);
+
+function findRecipe(q){
+  q = (q||"").trim();
+  if(!q) return null;
+  if(RECIPES[q]) return {key:q, data:RECIPES[q]};
+  // 模糊比對：使用者輸入包含關鍵字，或關鍵字包含輸入
+  for(let i=0;i<RECIPE_KEYS.length;i++){
+    const k = RECIPE_KEYS[i];
+    if(q.indexOf(k) >= 0 || k.indexOf(q) >= 0) return {key:k, data:RECIPES[k]};
   }
-  if(d.rainbow&&d.rainbow.length){
-    h += '<div class="tags" style="margin:8px 0">';
-    d.rainbow.forEach(c=> h+='<span class="tag" style="background:'+tagColor(c)+'">'+esc(c)+'</span>');
-    h += '</div>';
-  }
-  if(d.balance) h += '<p style="font-size:13.5px;color:#3c4d43;margin:8px 0 0">⚖️ '+esc(d.balance)+'</p>';
-  if(d.suggestions&&d.suggestions.length){
-    h += '<b style="font-size:14px;display:block;margin-top:10px">建議</b><ul class="tiplist">'+
-         d.suggestions.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';
-  }
-  h += '</div>';
-  const div=document.createElement('div'); div.id='result'; div.innerHTML=h;
-  photoArea.appendChild(div);
+  // 常見別名
+  const alias = {"雞":"雞肉","牛":"牛肉","豬":"豬肉","蕃茄":"番茄","蛋類":"蛋","雞蛋":"蛋","鮭魚":"魚類","魚":"魚類","鮮魚":"魚類","蝦子":"蝦","蝦仁":"蝦","土豆":"馬鈴薯","洋芋":"馬鈴薯","豆干":"豆腐","板豆腐":"豆腐"};
+  if(alias[q]) return {key:alias[q], data:RECIPES[alias[q]]};
+  return null;
 }
 
-/* ---------------- 食材發想 ---------------- */
+function showRecipe(ing){
+  const out = document.getElementById('ideaOut');
+  const hit = findRecipe(ing);
+  document.querySelectorAll('#ingGrid .ing').forEach(b=>b.setAttribute('aria-pressed', (hit && b.dataset.ing===hit.key)?'true':'false'));
+  if(!hit){
+    out.innerHTML = '<div class="err">目前收錄了這些食材：'+ RECIPE_KEYS.join('、') +
+      '。<br>試試點上面的按鈕，或輸入其中一種。</div>';
+    return;
+  }
+  renderIdea({intro:hit.data.intro, dishes:hit.data.dishes}, out);
+}
+
 document.querySelectorAll('#ingGrid .ing').forEach(b=>b.addEventListener('click',()=>{
   document.getElementById('ingInput').value='';
-  suggestIdea(b.dataset.ing);
+  showRecipe(b.dataset.ing);
 }));
 document.getElementById('ingBtn').addEventListener('click',()=>{
-  suggestIdea(document.getElementById('ingInput').value.trim());
+  showRecipe(document.getElementById('ingInput').value.trim());
 });
 document.getElementById('ingInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter') suggestIdea(e.target.value.trim());
+  if(e.key==='Enter') showRecipe(e.target.value.trim());
 });
-
-let ideaBusy=false;
-async function suggestIdea(ing){
-  const out=document.getElementById('ideaOut');
-  if(!ing){ out.innerHTML='<div class="err">先選一個食材，或輸入你想用的食材。</div>'; return; }
-  if(ideaBusy) return;
-  ideaBusy=true;
-  document.querySelectorAll('#ingGrid .ing').forEach(b=>b.setAttribute('aria-pressed', b.dataset.ing===ing?'true':'false'));
-  out.innerHTML='<p class="sub" style="margin:16px 0"><span class="spin brand"></span> 正在發想「'+esc(ing)+'」的料理…</p>';
-  const prompt='你是輕飲食料理顧問。使用者手邊有「'+ing+'」這個食材，請推薦 4 道以它為主、做法清爽健康（少油少加工，多用蒸、煮、烤、涼拌）的家常料理。'+
-    '只回傳 JSON，不要任何說明或 markdown。格式：\n'+
-    '{"ingredient":"'+ing+'","intro":"一句話","dishes":[{"name":"菜名","desc":"一句話做法重點","calories":整數,"time":"約15分鐘","tags":["低油","快速"]}]}\n'+
-    'calories 是單人份概估熱量。全部用繁體中文。';
-  try{
-    const data=parseJSON(await askAI([{role:"user",content:prompt}],1800));
-    renderIdea(data,out);
-  }catch(e){
-    out.innerHTML='<div class="err">發想時出了點問題，請再試一次。<br><small>'+(e.message||e)+'</small></div>';
-  }finally{ ideaBusy=false; }
-}
 
 function renderIdea(d,out){
   let h='';
@@ -664,144 +754,6 @@ function renderIdea(d,out){
     h+='</div></div>';
   });
   out.innerHTML=h || '<div class="err">這個食材暫時想不到，換個說法再試試。</div>';
-}
-
-/* ---------------- 餐盤分享 ---------------- */
-/* 填入你的 Firebase 專案設定（Firebase 控制台 → 專案設定 → 你的應用程式） */
-const FIREBASE_CONFIG = {
-  apiKey: "你的_API_KEY",
-  authDomain: "你的專案.firebaseapp.com",
-  projectId: "你的專案ID",
-  storageBucket: "你的專案.appspot.com",
-  messagingSenderId: "你的_SENDER_ID",
-  appId: "你的_APP_ID"
-};
-
-let db=null, shareMode='demo', demoPosts=[], shareImg=null;
-const myLikes=new Set();
-let userName='訪客_'+Math.floor(1000+Math.random()*9000);
-
-(function initShare(){
-  const configured = FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.includes('你的');
-  document.getElementById('userName').value=userName;
-  if(typeof firebase!=='undefined' && configured){
-    try{
-      firebase.initializeApp(FIREBASE_CONFIG);
-      db=firebase.firestore();
-      shareMode='live';
-      db.collection('posts').orderBy('ts','desc').limit(50).onSnapshot(
-        snap=>{ const arr=[]; snap.forEach(d=>arr.push(Object.assign({id:d.id},d.data()))); renderFeed(arr); },
-        err=>{ document.getElementById('feed').innerHTML='<div class="err">讀取貼文失敗：'+esc(err.message)+'</div>'; }
-      );
-    }catch(e){ shareMode='demo'; }
-  }
-  if(shareMode==='demo'){
-    document.getElementById('shareBanner').innerHTML='<div class="banner">📡 <b>示範模式</b>：尚未連接 Firebase，貼文只暫存在這個瀏覽器分頁、重整就消失，也不會跟別人共享。填好上方 FIREBASE_CONFIG 並部署後，即為真正的線上分享。</div>';
-    renderFeed(demoPosts);
-  }
-})();
-
-document.getElementById('userName').addEventListener('input',e=>{ userName=e.target.value.trim()||userName; });
-
-const shareDrop=document.getElementById('shareDrop');
-const shareFile=document.getElementById('shareFile');
-shareDrop.addEventListener('click',()=>shareFile.click());
-shareFile.addEventListener('change',async e=>{
-  const f=e.target.files[0]; if(!f) return;
-  shareDrop.querySelector('p b').textContent='壓縮中…';
-  try{
-    shareImg=await compressImage(f);
-    const pv=document.getElementById('sharePreview');
-    pv.src=shareImg; pv.style.display='block';
-    document.getElementById('postBtn').disabled=false;
-    shareDrop.querySelector('p b').textContent='已選好，可換一張';
-  }catch(err){ shareDrop.querySelector('p b').textContent='讀取失敗，再試一次'; }
-});
-
-const postBtn=document.getElementById('postBtn');
-postBtn.addEventListener('click',async ()=>{
-  if(!shareImg) return;
-  const errBox=document.getElementById('shareErr'); errBox.innerHTML='';
-  const caption=document.getElementById('shareCap').value.trim();
-  const name=(document.getElementById('userName').value.trim()||userName).slice(0,16);
-  postBtn.disabled=true; postBtn.innerHTML='<span class="spin"></span>發布中…';
-  try{
-    if(shareMode==='live'){
-      await db.collection('posts').add({ name:name, caption:caption, image:shareImg, likes:0, ts:firebase.firestore.FieldValue.serverTimestamp() });
-    }else{
-      demoPosts.unshift({ id:'d'+Date.now(), name:name, caption:caption, image:shareImg, likes:0, ts:new Date() });
-      renderFeed(demoPosts);
-    }
-    shareImg=null;
-    document.getElementById('sharePreview').style.display='none';
-    document.getElementById('shareCap').value='';
-    shareDrop.querySelector('p b').textContent='點此選擇餐盤照片';
-  }catch(e){
-    errBox.innerHTML='<div class="err">發布失敗：'+esc(e.message||String(e))+'</div>';
-  }finally{
-    postBtn.disabled=false; postBtn.textContent='發布貼文';
-  }
-});
-
-function timeAgo(ts){
-  let d;
-  try{ d = ts&&ts.toDate ? ts.toDate() : new Date(ts); }catch(_){ d=null; }
-  if(!d || isNaN(d.getTime())) return '剛剛';
-  const s=Math.floor((Date.now()-d.getTime())/1000);
-  if(s<60) return '剛剛';
-  if(s<3600) return Math.floor(s/60)+' 分鐘前';
-  if(s<86400) return Math.floor(s/3600)+' 小時前';
-  return Math.floor(s/86400)+' 天前';
-}
-
-function renderFeed(posts){
-  const feed=document.getElementById('feed');
-  if(!posts || !posts.length){ feed.innerHTML='<div class="empty">還沒有人分享餐盤，當第一個吧！🍽️</div>'; return; }
-  feed.innerHTML=posts.map(p=>{
-    const initial=esc(String(p.name||'訪').charAt(0));
-    const liked=myLikes.has(p.id);
-    return '<div class="post">'+
-      '<div class="phead"><div class="ava">'+initial+'</div>'+
-        '<div class="pmeta"><b>'+esc(p.name||'匿名')+'</b><span>'+timeAgo(p.ts)+'</span></div></div>'+
-      '<img class="pimg" src="'+esc(p.image||'')+'" alt="餐盤照片">'+
-      (p.caption?'<div class="pcap">'+esc(p.caption)+'</div>':'')+
-      '<div class="pfoot"><button class="likebtn'+(liked?' on':'')+'" data-id="'+esc(p.id)+'">❤️ '+(p.likes||0)+'</button></div>'+
-    '</div>';
-  }).join('');
-  feed.querySelectorAll('.likebtn').forEach(b=>b.addEventListener('click',()=>likePost(b.dataset.id)));
-}
-
-async function likePost(id){
-  if(myLikes.has(id)) return;
-  myLikes.add(id);
-  if(shareMode==='live'){
-    try{ await db.collection('posts').doc(id).update({ likes:firebase.firestore.FieldValue.increment(1) }); }
-    catch(e){ myLikes.delete(id); }
-  }else{
-    const p=demoPosts.find(x=>x.id===id); if(p){ p.likes=(p.likes||0)+1; renderFeed(demoPosts); }
-  }
-}
-
-function compressImage(file, maxDim, quality){
-  maxDim=maxDim||720; quality=quality||0.72;
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    img.onload=()=>{
-      let w=img.width, h=img.height;
-      if(w>h && w>maxDim){ h=Math.round(h*maxDim/w); w=maxDim; }
-      else if(h>=w && h>maxDim){ w=Math.round(w*maxDim/h); h=maxDim; }
-      const c=document.createElement('canvas'); c.width=w; c.height=h;
-      c.getContext('2d').drawImage(img,0,0,w,h);
-      let q=quality, url=c.toDataURL('image/jpeg',q);
-      while(url.length>900000 && q>0.4){ q-=0.1; url=c.toDataURL('image/jpeg',q); }
-      resolve(url);
-    };
-    img.onerror=()=>reject(new Error('圖片讀取失敗'));
-    const r=new FileReader();
-    r.onload=()=>{ img.src=r.result; };
-    r.onerror=()=>reject(new Error('檔案讀取失敗'));
-    r.readAsDataURL(file);
-  });
 }
 
 /* ---------------- 工具 ---------------- */
